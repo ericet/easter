@@ -95,6 +95,19 @@
             margin-bottom: 20px;
         }
         
+        .game-preview {
+            margin: 20px auto;
+            text-align: center;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+            border: 3px solid #DEB887;
+        }
+        
         .mode-button {
             padding: 15px 30px;
             font-size: 18px;
@@ -509,6 +522,9 @@
             
             <!-- Game Mode Selection -->
             <div id="mode-selection">
+                <div class="game-preview">
+                    <img src="assets/preview.png" alt="Easter Egg Hunt Game Preview" class="preview-image">
+                </div>
                 <h2>Select Game Mode</h2>
                 <div class="mode-buttons">
                     <button id="singlePlayerMode" class="mode-button">🥚 Single Player</button>
