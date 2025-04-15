@@ -280,8 +280,8 @@ class MultiplayerManager {
                 .sort((a, b) => b.score - a.score);
 
             // Show results modal with null checks
-            const resultsModal = document.getElementById('results-modal');
-            const resultsList = document.getElementById('results-list');
+            const resultsModal = safeGetElement('results-modal');
+            const resultsList = safeGetElement('results-list');
             
             if (!resultsModal || !resultsList) {
                 console.error('Results modal or list elements not found');
@@ -295,12 +295,31 @@ class MultiplayerManager {
                 item.className = 'result-item';
                 item.innerHTML = `
                     <span class="place">${index + 1}</span>
-                    <span class="name">${score.name}</span>
+                    <span class="name">${index === 0 ? '<span class="crown">👑</span>' : ''} ${score.name}</span>
                     <span class="score">${score.score}</span>
-                    ${index === 0 ? '<span class="crown">👑</span>' : ''}
                 `;
                 resultsList.appendChild(item);
             });
+            
+            // Clear the existing buttons
+            const buttonsContainer = safeGetElement('results-buttons');
+            if (buttonsContainer) {
+                buttonsContainer.innerHTML = '';
+                
+                // Add Play Again button for the same session
+                const playAgainButton = document.createElement('button');
+                playAgainButton.className = 'game-button';
+                playAgainButton.textContent = 'Play Again (Same Session)';
+                playAgainButton.onclick = () => this.restartSession();
+                buttonsContainer.appendChild(playAgainButton);
+                
+                // Add New Game button
+                const newGameButton = document.createElement('button');
+                newGameButton.className = 'game-button';
+                newGameButton.textContent = 'New Game';
+                newGameButton.onclick = () => location.reload();
+                buttonsContainer.appendChild(newGameButton);
+            }
 
             resultsModal.style.display = 'block';
         } catch (error) {
@@ -314,6 +333,85 @@ class MultiplayerManager {
             if (this.isHost) {
                 this.sessionRef.remove();
             }
+        }
+    }
+    
+    async restartSession() {
+        try {
+            // Close the results modal
+            const resultsModal = safeGetElement('results-modal');
+            if (resultsModal) {
+                resultsModal.style.display = 'none';
+            }
+            
+            // Get the session data to identify the host
+            const sessionSnapshot = await this.sessionRef.once('value');
+            const sessionData = sessionSnapshot.val() || {};
+            const hostId = sessionData.host;
+            
+            // Clear previous scores
+            if (this.scoresRef) {
+                await this.scoresRef.remove();
+            }
+            
+            // Get current players
+            const playersSnapshot = await this.playersRef.once('value');
+            const players = playersSnapshot.val() || {};
+            
+            // First, update the session status to waiting
+            await this.sessionRef.update({
+                status: 'waiting',
+                startTime: null,
+                endTime: null
+            });
+            
+            // Then update player ready states
+            for (const [playerId, playerData] of Object.entries(players)) {
+                // If player is the host, set to ready, otherwise set to not ready
+                const isHost = playerId === hostId;
+                await this.playersRef.child(playerId).update({
+                    ready: isHost
+                });
+            }
+            
+            // Update session link display
+            const sessionLinkElement = safeGetElement('session-link');
+            if (sessionLinkElement) {
+                const sessionLink = `${window.location.href.split('?')[0]}?session=${this.sessionId}`;
+                sessionLinkElement.textContent = sessionLink;
+            }
+            
+            // Show session info and controls again
+            const sessionInfo = safeGetElement('session-info');
+            const readyButton = safeGetElement('readyButton');
+            
+            if (sessionInfo) sessionInfo.style.display = 'block';
+            
+            // Only show Ready button for non-host players
+            if (readyButton) {
+                if (this.isHost) {
+                    readyButton.style.display = 'none';
+                } else {
+                    readyButton.style.display = 'block';
+                    readyButton.textContent = 'Ready'; // Reset button text to initial state
+                }
+            }
+            
+            // Update UI for multiplayer mode
+            this.updateMultiplayerUI();
+            
+            // Show game UI
+            const gameUI = safeGetElement('game-ui');
+            if (gameUI) gameUI.style.display = 'block';
+            
+            // Reset game instance if needed
+            const gameInstance = window.gameInstance;
+            if (gameInstance && typeof gameInstance.initializeGame === 'function') {
+                gameInstance.initializeGame();
+            }
+        } catch (error) {
+            console.error('Error restarting session:', error);
+            alert('Failed to restart session: ' + error.message);
         }
     }
 }
