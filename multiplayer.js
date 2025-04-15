@@ -13,6 +13,7 @@ class MultiplayerManager {
         this.sessionRef = null;
         this.playersRef = null;
         this.scoresRef = null;
+        this.winsRef = null; // Reference to track player wins
     }
     
     // Helper method to update UI for multiplayer mode
@@ -41,6 +42,7 @@ class MultiplayerManager {
             this.sessionRef = firebase.database().ref(`sessions/${this.sessionId}`);
             this.playersRef = this.sessionRef.child('players');
             this.scoresRef = this.sessionRef.child('scores');
+            this.winsRef = this.sessionRef.child('wins');
 
             await this.sessionRef.set({
                 status: 'waiting',
@@ -73,6 +75,7 @@ class MultiplayerManager {
             this.sessionRef = firebase.database().ref(`sessions/${this.sessionId}`);
             this.playersRef = this.sessionRef.child('players');
             this.scoresRef = this.sessionRef.child('scores');
+            this.winsRef = this.sessionRef.child('wins');
 
             // Check if session exists
             const snapshot = await this.sessionRef.once('value');
@@ -90,6 +93,13 @@ class MultiplayerManager {
             
             // Update UI for multiplayer mode (hides single player start button and manages multiplayer start button)
             this.updateMultiplayerUI();
+            
+            // Update session link display
+            const sessionLinkElement = safeGetElement('session-link');
+            if (sessionLinkElement) {
+                const sessionLink = `${window.location.href.split('?')[0]}?session=${this.sessionId}`;
+                sessionLinkElement.textContent = sessionLink;
+            }
 
             this.listenToPlayers();
             this.listenToGameStart();
@@ -279,6 +289,18 @@ class MultiplayerManager {
                 }))
                 .sort((a, b) => b.score - a.score);
 
+            // Get the winner (highest score)
+            if (sortedScores.length > 0) {
+                const winner = sortedScores[0];
+                
+                // Update win count for the winner
+                await this.updateWinCount(winner.id, winner.name);
+            }
+            
+            // Get current win counts
+            const winsSnapshot = await this.winsRef.once('value');
+            const wins = winsSnapshot.val() || {};
+
             // Show results modal with null checks
             const resultsModal = safeGetElement('results-modal');
             const resultsList = safeGetElement('results-list');
@@ -290,6 +312,11 @@ class MultiplayerManager {
             
             resultsList.innerHTML = '';
 
+            // Add game results
+            const gameResultsTitle = document.createElement('h3');
+            gameResultsTitle.textContent = 'Game Results';
+            resultsList.appendChild(gameResultsTitle);
+
             sortedScores.forEach((score, index) => {
                 const item = document.createElement('div');
                 item.className = 'result-item';
@@ -297,6 +324,31 @@ class MultiplayerManager {
                     <span class="place">${index + 1}</span>
                     <span class="name">${index === 0 ? '<span class="crown">👑</span>' : ''} ${score.name}</span>
                     <span class="score">${score.score}</span>
+                `;
+                resultsList.appendChild(item);
+            });
+            
+            // Add session leaderboard
+            const leaderboardTitle = document.createElement('h3');
+            leaderboardTitle.textContent = 'Session Leaderboard';
+            leaderboardTitle.style.marginTop = '20px';
+            resultsList.appendChild(leaderboardTitle);
+            
+            // Convert wins to array and sort by win count
+            const sortedWins = Object.entries(wins)
+                .map(([id, data]) => ({
+                    id,
+                    ...data
+                }))
+                .sort((a, b) => b.wins - a.wins);
+                
+            sortedWins.forEach((player, index) => {
+                const item = document.createElement('div');
+                item.className = 'result-item leaderboard-item';
+                item.innerHTML = `
+                    <span class="place">${index + 1}</span>
+                    <span class="name">${player.name}</span>
+                    <span class="wins">${player.wins} ${player.wins === 1 ? 'win' : 'wins'}</span>
                 `;
                 resultsList.appendChild(item);
             });
@@ -333,6 +385,30 @@ class MultiplayerManager {
             if (this.isHost) {
                 this.sessionRef.remove();
             }
+        }
+    }
+    
+    async updateWinCount(playerId, playerName) {
+        try {
+            // Get current win count for the player
+            const playerWinsRef = this.winsRef.child(playerId);
+            const snapshot = await playerWinsRef.once('value');
+            const currentData = snapshot.val();
+            
+            if (currentData) {
+                // Player already has wins, increment count
+                await playerWinsRef.update({
+                    wins: currentData.wins + 1
+                });
+            } else {
+                // First win for this player
+                await playerWinsRef.set({
+                    name: playerName,
+                    wins: 1
+                });
+            }
+        } catch (error) {
+            console.error('Error updating win count:', error);
         }
     }
     
