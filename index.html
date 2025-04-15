@@ -233,8 +233,7 @@
             padding: 20px;
             border-radius: 15px;
             border: 4px solid #DEB887;
-            width: 250px;
-            height: 480px;
+            width: 280px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -264,7 +263,6 @@
             border-radius: 10px;
             color: #8B4513;
             transition: transform 0.2s, box-shadow 0.2s;
-            word-break: break-word;
         }
 
         .leaderboard-entry span {
@@ -284,15 +282,18 @@
             margin-right: 10px;
             font-size: 16px;
             text-align: left;
-            max-width: 120px;
+            max-width: 100px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .leaderboard-entry .score {
             font-weight: bold;
             font-size: 18px;
             color: #FF6347;
+            min-width: 40px;
+            text-align: right;
         }
 
         .leaderboard-entry:hover {
