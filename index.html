@@ -519,6 +519,159 @@
                 opacity: 0;
             }
         }
+        
+        /* How to Play Modal Styles */
+        #how-to-play-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .how-to-play-content {
+            position: relative;
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 15px;
+            border: 4px solid #DEB887;
+            box-shadow: 0 8px 32px rgba(139, 69, 19, 0.2);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #8B4513;
+            cursor: pointer;
+        }
+        
+        .instructions-section {
+            margin-bottom: 25px;
+            text-align: left;
+            padding: 0 15px;
+        }
+        
+        .instructions-section h3 {
+            color: #8B4513;
+            border-bottom: 2px dashed #DEB887;
+            padding-bottom: 8px;
+            margin-top: 25px;
+        }
+        
+        .egg-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .egg-type {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 245, 238, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            width: 45%;
+            min-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .egg-icon {
+            width: 40px;
+            height: 50px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            margin-right: 15px;
+            position: relative;
+        }
+        
+        .regular-egg {
+            background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%);
+        }
+        
+        .golden-egg {
+            background: linear-gradient(135deg, #FFD700 0%, #DAA520 100%);
+            box-shadow: 0 0 15px #FFD700;
+        }
+        
+        .rainbow-egg {
+            background: linear-gradient(to bottom, 
+                #FF0000, #FF8800, #FFFF00, 
+                #00FF00, #0088FF, #8800FF);
+        }
+        
+        .thunder-egg {
+            background: #FFFF00;
+            box-shadow: 0 0 10px #FFFF00;
+        }
+        
+        .egg-icon::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 20%;
+            height: 20%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+        
+        .egg-description {
+            flex: 1;
+        }
+        
+        .egg-description h4 {
+            margin: 0 0 5px 0;
+            color: #8B4513;
+        }
+        
+        .egg-description p {
+            margin: 0;
+            font-size: 14px;
+        }
+        
+        /* Help link styling */
+        .help-link {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .info-link {
+            color: #8B4513;
+            text-decoration: none;
+            font-size: 16px;
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            transition: all 0.2s;
+        }
+        
+        .info-link:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: scale(1.05);
+        }
+        
+        .info-button {
+            background: linear-gradient(to bottom, #90EE90, #32CD32);
+            color: #006400;
+        }
+        
+        .multiplayer-buttons.second-row {
+            margin-top: 15px;
+        }
     </style>
 </head>
 
@@ -542,6 +695,9 @@
                     <button id="singlePlayerMode" class="mode-button">🥚 Single Player</button>
                     <button id="multiplayerMode" class="mode-button">👥 Multiplayer</button>
                 </div>
+                <div class="help-link">
+                    <a href="#" id="howToPlayBtn" class="info-link">❓ How to Play</a>
+                </div>
             </div>
             
             <!-- Game UI -->
@@ -556,6 +712,7 @@
                 <div id="game-controls">
                     <button id="startButton" class="game-button">Start Game</button>
                     <button id="restartButton" class="game-button" style="display: none;">Play Again</button>
+                    <button id="gameHowToPlayBtn" class="game-button info-button">❓ How to Play</button>
                 </div>
                 <div id="instructions">
                     Use arrow keys to move • Collect eggs • Avoid trees
@@ -569,7 +726,10 @@
                     <button id="createSessionButton" class="game-button">Create Game</button>
                     <button id="joinSessionButton" class="game-button">Join Game</button>
                 </div>
-                <button id="backToModeSelection" class="game-button">Back to Mode Selection</button>
+                <div class="multiplayer-buttons second-row">
+                    <button id="backToModeSelection" class="game-button">Back to Mode Selection</button>
+                    <button id="mpHowToPlayBtn" class="game-button info-button">❓ How to Play</button>
+                </div>
             </div>
             <div id="session-info">
                 <h3>Multiplayer Session</h3>
@@ -587,6 +747,78 @@
                 <div id="results-list"></div>
                 <div id="results-buttons">
                     <button class="game-button" onclick="location.reload()">Play Again</button>
+                </div>
+            </div>
+            
+            <!-- How to Play Modal -->
+            <div id="how-to-play-modal">
+                <div class="how-to-play-content">
+                    <span class="close-button" id="close-how-to-play">&times;</span>
+                    <h2>How to Play</h2>
+                    
+                    <div class="instructions-section">
+                        <h3>Game Controls</h3>
+                        <p><strong>Movement:</strong> Use the arrow keys (↑, ↓, ←, →) to move your bunny around the garden.</p>
+                        <p><strong>Objective:</strong> Collect as many eggs as possible before the time runs out!</p>
+                    </div>
+                    
+                    <div class="instructions-section">
+                        <h3>Egg Types</h3>
+                        <div class="egg-types">
+                            <div class="egg-type">
+                                <div class="egg-icon regular-egg"></div>
+                                <div class="egg-description">
+                                    <h4>Regular Egg</h4>
+                                    <p>Worth 1 point each. Comes in various colors and patterns.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="egg-type">
+                                <div class="egg-icon golden-egg"></div>
+                                <div class="egg-description">
+                                    <h4>Golden Egg</h4>
+                                    <p>Worth 5 points! These rare eggs have a special golden glow.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="egg-type">
+                                <div class="egg-icon rainbow-egg"></div>
+                                <div class="egg-description">
+                                    <h4>Rainbow Egg</h4>
+                                    <p>Worth 10 points! The rarest egg with shifting rainbow colors.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="egg-type">
+                                <div class="egg-icon thunder-egg"></div>
+                                <div class="egg-description">
+                                    <h4>Thunder Egg</h4>
+                                    <p>Gives your bunny a permanent speed boost (+50%)! Also worth 1 point.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions-section">
+                        <h3>Multiplayer Mode</h3>
+                        <p><strong>Creating a Session:</strong> Click "Create Session" and share the link with friends.</p>
+                        <p><strong>Joining a Session:</strong> Use a shared link or enter a session ID to join.</p>
+                        <p><strong>Getting Ready:</strong> Click the "Ready" button when you're prepared to play.</p>
+                        <p><strong>Starting the Game:</strong> The host can start the game once all players are ready.</p>
+                        <p><strong>Leaderboard:</strong> Track wins across multiple games in the same session!</p>
+                    </div>
+                    
+                    <div class="instructions-section">
+                        <h3>Tips & Tricks</h3>
+                        <ul>
+                            <li>Look for the special glow of Golden and Rainbow eggs</li>
+                            <li>The Thunder egg's speed boost helps you collect more eggs faster</li>
+                            <li>Navigate around obstacles carefully to reach eggs efficiently</li>
+                            <li>In multiplayer, the player with the most eggs when time runs out wins!</li>
+                        </ul>
+                    </div>
+                    
+                    <button id="close-instructions" class="game-button">Got it!</button>
                 </div>
             </div>
         </div>
@@ -631,6 +863,28 @@
     <script>
         const multiplayer = new MultiplayerManager();
         window.isMultiplayerMode = false;
+        
+        // How to Play modal functionality
+        function showHowToPlay() {
+            document.getElementById('how-to-play-modal').style.display = 'block';
+        }
+        
+        function hideHowToPlay() {
+            document.getElementById('how-to-play-modal').style.display = 'none';
+        }
+        
+        // Add event listeners for all How to Play buttons
+        document.getElementById('howToPlayBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showHowToPlay();
+        });
+        
+        document.getElementById('gameHowToPlayBtn').addEventListener('click', showHowToPlay);
+        document.getElementById('mpHowToPlayBtn').addEventListener('click', showHowToPlay);
+        
+        // Close buttons
+        document.getElementById('close-how-to-play').addEventListener('click', hideHowToPlay);
+        document.getElementById('close-instructions').addEventListener('click', hideHowToPlay);
         
         // Mode selection handlers
         document.getElementById('singlePlayerMode').addEventListener('click', () => {
