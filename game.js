@@ -419,35 +419,11 @@ class Game {
                 if (egg.isGolden) {
                     this.score += 5;
                     // Show golden egg bonus
-                    const bonus = document.createElement('div');
-                    bonus.textContent = '+5';
-                    bonus.style.position = 'absolute';
-                    bonus.style.left = `${egg.x}px`;
-                    bonus.style.top = `${egg.y}px`;
-                    bonus.style.color = '#FFD700';
-                    bonus.style.fontWeight = 'bold';
-                    bonus.style.fontSize = '24px';
-                    bonus.style.textShadow = '2px 2px 4px rgba(0,0,0,0.3)';
-                    bonus.style.animation = 'floatUp 1s ease-out';
-                    document.getElementById('game-container').appendChild(bonus);
-                    setTimeout(() => bonus.remove(), 1000);
+                    this.showBonusPoints(egg.x, egg.y, '+5', '#FFD700');
                 } else if (egg.isRainbow) {
                     this.score += 10;
                     // Show rainbow egg bonus with rainbow text
-                    const bonus = document.createElement('div');
-                    bonus.textContent = '+10';
-                    bonus.style.position = 'absolute';
-                    bonus.style.left = `${egg.x}px`;
-                    bonus.style.top = `${egg.y}px`;
-                    bonus.style.background = 'linear-gradient(90deg, red, orange, yellow, green, blue, purple)';
-                    bonus.style.webkitBackgroundClip = 'text';
-                    bonus.style.webkitTextFillColor = 'transparent';
-                    bonus.style.fontWeight = 'bold';
-                    bonus.style.fontSize = '24px';
-                    bonus.style.textShadow = '2px 2px 4px rgba(0,0,0,0.3)';
-                    bonus.style.animation = 'floatUp 1s ease-out';
-                    document.getElementById('game-container').appendChild(bonus);
-                    setTimeout(() => bonus.remove(), 1000);
+                    this.showBonusPoints(egg.x, egg.y, '+10', 'rainbow');
                 } else {
                     this.score++;
                 }
@@ -460,6 +436,46 @@ class Game {
         if (this.eggs.length === 0) {
             this.spawnEggs();
         }
+    }
+    
+    // Helper method to show bonus points directly above eggs
+    showBonusPoints(x, y, text, color) {
+        // Create bonus text element
+        const bonus = document.createElement('div');
+        bonus.textContent = text;
+        bonus.style.position = 'fixed';
+        bonus.style.fontWeight = 'bold';
+        bonus.style.fontSize = '24px';
+        bonus.style.textShadow = '2px 2px 4px rgba(0,0,0,0.3)';
+        bonus.style.zIndex = '20';
+        
+        // Get canvas position
+        const canvasRect = this.canvas.getBoundingClientRect();
+        
+        // Position directly above the egg in canvas coordinates
+        const canvasX = canvasRect.left + x;
+        const canvasY = canvasRect.top + y - 30; // Position above the egg
+        
+        bonus.style.left = `${canvasX}px`;
+        bonus.style.top = `${canvasY}px`;
+        
+        // Apply appropriate styling based on egg type
+        if (color === 'rainbow') {
+            bonus.style.background = 'linear-gradient(90deg, red, orange, yellow, green, blue, purple)';
+            bonus.style.webkitBackgroundClip = 'text';
+            bonus.style.webkitTextFillColor = 'transparent';
+        } else {
+            bonus.style.color = color;
+        }
+        
+        // Add animation
+        bonus.style.animation = 'floatUp 1s ease-out';
+        
+        // Add to document body to ensure proper positioning
+        document.body.appendChild(bonus);
+        
+        // Remove after animation completes
+        setTimeout(() => bonus.remove(), 1000);
     }
 
     drawPlayer() {
