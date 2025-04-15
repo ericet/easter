@@ -133,13 +133,22 @@ class MultiplayerManager {
                     // Update the multiplayer start button state based on player readiness (for host only)
                     if (this.isHost) {
                         const startButton = safeGetElement('startMultiplayerButton');
-                        if (startButton && playersList.length > 0) {
+                        if (startButton) {
+                            // Check if there are at least 2 players and all are ready
+                            const hasEnoughPlayers = playersList.length >= 2;
                             const allReady = playersList.every(player => player.ready);
-                            startButton.disabled = !allReady;
-                            if (allReady) {
-                                startButton.textContent = 'Start Game (All Ready!)';
+                            const canStartGame = hasEnoughPlayers && allReady;
+                            
+                            // Disable button if not enough players or not all ready
+                            startButton.disabled = !canStartGame;
+                            
+                            // Update button text based on state
+                            if (!hasEnoughPlayers) {
+                                startButton.textContent = 'Waiting for Players...';
+                            } else if (!allReady) {
+                                startButton.textContent = 'Waiting for Ready...';
                             } else {
-                                startButton.textContent = 'Start Game (Waiting...)';
+                                startButton.textContent = 'Start Game (All Ready!)';
                             }
                         }
                     }
