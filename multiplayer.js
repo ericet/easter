@@ -8,7 +8,10 @@ class MultiplayerManager {
     constructor() {
         this.sessionId = null;
         this.isHost = false;
-        this.playerId = Math.random().toString(36).substring(2, 15);
+        // Use existing playerId from localStorage or generate a new one
+        this.playerId = localStorage.getItem('playerId') || Math.random().toString(36).substring(2, 15);
+        // Store the playerId in localStorage
+        localStorage.setItem('playerId', this.playerId);
         this.playerName = '';
         this.sessionRef = null;
         this.playersRef = null;
