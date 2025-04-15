@@ -116,6 +116,7 @@ class Game {
             width: 40,
             height: 50,
             speed: 4,
+            baseSpeed: 4, // Store base speed for reference
             direction: 'right',
             color: '#FFFFFF',  // White for the Easter bunny
             earColor: '#FFE4E4',  // Pink inner ears
@@ -195,6 +196,7 @@ class Game {
         // Special egg chances
         const hasGoldenEgg = Math.random() < 0.2;  // 20% chance for golden egg
         const hasRainbowEgg = Math.random() < 0.1; // 10% chance for rainbow egg
+        const hasThunderEgg = Math.random() < 0.2; // 20% chance for thunder egg
         
         for (let i = 0; i < numEggs; i++) {
             let egg;
@@ -212,7 +214,7 @@ class Game {
                     isRainbow: false
                 };
                 
-                // Special egg assignments (first two eggs only)
+                // Special egg assignments (first three eggs only)
                 if (i === 0 && hasGoldenEgg) {
                     egg.color = '#FFD700';
                     egg.pattern = 3; // Special pattern for golden egg
@@ -221,6 +223,10 @@ class Game {
                     egg.pattern = 4; // Special pattern for rainbow egg
                     egg.isRainbow = true;
                     egg.color = 'rainbow'; // Special marker for rainbow gradient
+                } else if (i === 2 && hasThunderEgg) {
+                    egg.pattern = 5; // Special pattern for thunder egg
+                    egg.isThunder = true;
+                    egg.color = '#FFFF00'; // Yellow color for thunder egg
                 }
                 
                 if (!this.checkEggCollision(egg)) {
@@ -424,6 +430,14 @@ class Game {
                     this.score += 10;
                     // Show rainbow egg bonus with rainbow text
                     this.showBonusPoints(egg.x, egg.y, '+10', 'rainbow');
+                } else if (egg.isThunder) {
+                    // Permanently increase player speed by 50%
+                    this.player.speed = this.player.speed * 1.5;
+                    
+                    // Show thunder speed boost notification
+                    this.showBonusPoints(egg.x, egg.y, '⚡ SPEED +50%! ⚡', '#FFFF00');
+                    
+                    this.score++;
                 } else {
                     this.score++;
                 }
@@ -786,6 +800,33 @@ class Game {
                 this.ctx.shadowBlur = 15;
                 this.ctx.shadowOffsetX = 0;
                 this.ctx.shadowOffsetY = 0;
+            } else if (egg.isThunder) {
+                // Create dynamic thunder effect
+                const time = Date.now();
+                // Create pulsating effect
+                const pulseRate = 0.01;
+                const pulseIntensity = Math.sin(time * pulseRate);
+                const flash = pulseIntensity > 0 ? '#FFFF00' : '#FFFFFF';
+                
+                // Create a more dramatic gradient for thunder egg
+                const gradient = this.ctx.createRadialGradient(
+                    egg.x + egg.width/2, egg.y + egg.height/2, 0,
+                    egg.x + egg.width/2, egg.y + egg.height/2, egg.width/2
+                );
+                
+                // More dramatic color scheme
+                gradient.addColorStop(0, '#FFFFFF'); // Bright center
+                gradient.addColorStop(0.4, '#FFFF00'); // Electric yellow
+                gradient.addColorStop(0.7, '#FF9500'); // Orange glow
+                gradient.addColorStop(1, '#4B0082'); // Indigo for storm cloud effect
+                
+                this.ctx.fillStyle = gradient;
+                
+                // Enhanced electric thunder glow effect
+                this.ctx.shadowColor = flash;
+                this.ctx.shadowBlur = 20 + Math.abs(pulseIntensity) * 10; // Pulsating glow
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 0;
 
             } else {
                 this.ctx.fillStyle = egg.color;
@@ -838,28 +879,96 @@ class Game {
                 case 2: // Spiral pattern
                     if (egg.isGolden) {
                         // Animated spiral for golden egg
+                    } else if (egg.isThunder) {
                         const time = Date.now() * 0.003;
+                        
+                        // Create dark storm cloud at the top
+                        const cloudGradient = this.ctx.createRadialGradient(
+                            egg.x + egg.width/2, egg.y + 5, 0,
+                            egg.x + egg.width/2, egg.y + 5, 10
+                        );
+                        cloudGradient.addColorStop(0, '#9494A1'); // Light gray
+                        cloudGradient.addColorStop(1, '#3A3A45'); // Dark gray
+                        
+                        this.ctx.fillStyle = cloudGradient;
                         this.ctx.beginPath();
-                        for(let i = 0; i < 4; i++) {
-                            const angle = time + i * Math.PI / 2;
-                            this.ctx.arc(egg.x + egg.width/2, 
-                                        egg.y + egg.height/2,
-                                        4 + i * 4, 
-                                        angle, angle + Math.PI * 1.2);
-                        }
+                        this.ctx.arc(egg.x + 15, egg.y + 5, 6, 0, Math.PI * 2);
+                        this.ctx.arc(egg.x + 8, egg.y + 8, 5, 0, Math.PI * 2);
+                        this.ctx.arc(egg.x + 22, egg.y + 8, 5, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        
+                        // Draw multiple lightning bolts with animation
+                        this.ctx.strokeStyle = '#FFFF00';
+                        this.ctx.lineWidth = 2;
+                        
+                        // Animate lightning position slightly
+                        const offsetX = Math.sin(time * 2) * 1.5;
+                        
+                        // Main lightning bolt
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(egg.x + 15 + offsetX, egg.y + 5);
+                        this.ctx.lineTo(egg.x + 10 + offsetX, egg.y + 12);
+                        this.ctx.lineTo(egg.x + 15 + offsetX, egg.y + 15);
+                        this.ctx.lineTo(egg.x + 7 + offsetX, egg.y + 25);
                         this.ctx.stroke();
                         
-                        // Add sparkles
-                        for(let i = 0; i < 3; i++) {
-                            const sparkleAngle = time * 2 + (i * Math.PI * 2 / 3);
-                            const radius = 12;
-                            const x = egg.x + egg.width/2 + Math.cos(sparkleAngle) * radius;
-                            const y = egg.y + egg.height/2 + Math.sin(sparkleAngle) * radius;
+                        // Second lightning bolt
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(egg.x + 18 - offsetX, egg.y + 7);
+                        this.ctx.lineTo(egg.x + 22 - offsetX, egg.y + 15);
+                        this.ctx.lineTo(egg.x + 18 - offsetX, egg.y + 18);
+                        this.ctx.lineTo(egg.x + 24 - offsetX, egg.y + 27);
+                        this.ctx.stroke();
+                        
+                        // Draw lightning bolt symbol with glow effect
+                        this.ctx.save();
+                        
+                        // Create glowing effect for the symbol
+                        const glowSize = 2 + Math.sin(time * 5) * 1; // Pulsating glow
+                        
+                        // Draw multiple layers with decreasing opacity for glow effect
+                        for (let i = 5; i > 0; i--) {
+                            this.ctx.font = `bold ${20 + i * glowSize}px Arial`;
+                            this.ctx.fillStyle = `rgba(255, 255, 0, ${0.1 * i})`;
+                            this.ctx.fillText('⚡', egg.x + egg.width/2, egg.y + egg.height/2);
+                        }
+                        
+                        // Draw the main symbol
+                        this.ctx.font = 'bold 20px Arial';
+                        this.ctx.fillStyle = '#FFFF00';
+                        this.ctx.strokeStyle = '#000000';
+                        this.ctx.lineWidth = 1.5;
+                        this.ctx.strokeText('⚡', egg.x + egg.width/2, egg.y + egg.height/2);
+                        this.ctx.fillText('⚡', egg.x + egg.width/2, egg.y + egg.height/2);
+                        
+                        this.ctx.restore();
+                        
+                        // Add electric sparks around the egg
+                        this.ctx.strokeStyle = '#FFFFFF';
+                        this.ctx.lineWidth = 1;
+                        
+                        for (let i = 0; i < 6; i++) {
+                            const sparkAngle = time * 2 + i * (Math.PI / 3);
+                            const radius = 15;
+                            const x = egg.x + egg.width/2 + Math.cos(sparkAngle) * radius;
+                            const y = egg.y + egg.height/2 + Math.sin(sparkAngle) * radius;
+                            
+                            // Draw branching sparks
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(x, y);
+                            this.ctx.lineTo(
+                                x + Math.cos(sparkAngle + Math.PI/4) * 4, 
+                                y + Math.sin(sparkAngle + Math.PI/4) * 4
+                            );
+                            this.ctx.stroke();
                             
                             this.ctx.beginPath();
-                            this.ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-                            this.ctx.fillStyle = '#FFF';
-                            this.ctx.fill();
+                            this.ctx.moveTo(x, y);
+                            this.ctx.lineTo(
+                                x + Math.cos(sparkAngle - Math.PI/4) * 4, 
+                                y + Math.sin(sparkAngle - Math.PI/4) * 4
+                            );
+                            this.ctx.stroke();
                         }
                     } else {
                         // Regular spiral pattern
