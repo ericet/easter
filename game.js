@@ -106,8 +106,8 @@ class Game {
         document.getElementById('score').textContent = '0';
         document.getElementById('time').textContent = '60';
         
-        // Show game canvas
-        this.canvas.style.display = 'block';
+        // Hide game canvas initially
+        this.canvas.style.display = 'none';
         document.getElementById('score-time').style.display = 'block';
         
         this.player = {
