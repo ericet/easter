@@ -723,21 +723,42 @@
             // Auto-join session from URL
             (async () => {
                 try {
+                    // Wait for DOM to be fully loaded before proceeding
+                    if (document.readyState !== 'complete') {
+                        await new Promise(resolve => {
+                            window.addEventListener('load', resolve);
+                            // Also set a timeout just in case
+                            setTimeout(resolve, 1000);
+                        });
+                    }
+                    
+                    // Try to join the session
                     await multiplayer.joinSession(sessionId);
+                    
+                    // Get player name
                     const name = prompt('Enter your name:');
                     if (!name) return;
 
                     window.isMultiplayerMode = true;
                     await multiplayer.setPlayerName(name);
                     
-                    // Hide mode selection and show multiplayer UI
-                    document.getElementById('mode-selection').style.display = 'none';
-                    document.getElementById('game-ui').style.display = 'block';
-                    document.getElementById('session-info').style.display = 'block';
-                    document.getElementById('readyButton').style.display = 'block';
-                    document.getElementById('multiplayer-controls').style.display = 'none';
-                    document.getElementById('leaderboard').style.display = 'none';
+                    // Helper function to safely set element display
+                    const safeSetDisplay = (id, display) => {
+                        const element = document.getElementById(id);
+                        if (element) element.style.display = display;
+                    };
+                    
+                    // Hide mode selection and show multiplayer UI with safe element access
+                    safeSetDisplay('mode-selection', 'none');
+                    safeSetDisplay('game-ui', 'block');
+                    safeSetDisplay('session-info', 'block');
+                    safeSetDisplay('readyButton', 'block');
+                    safeSetDisplay('multiplayer-controls', 'none');
+                    safeSetDisplay('leaderboard', 'none');
+                    safeSetDisplay('startMultiplayerButton', 'none'); // Hide start button for non-host players
+                    safeSetDisplay('startButton', 'none'); // Hide single-player start button
                 } catch (error) {
+                    console.error('Session join error:', error);
                     alert('Error joining session: ' + error.message);
                 }
             })();
