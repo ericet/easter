@@ -28,10 +28,15 @@
             background-size: 100px 100px;
         }
 
-        .game-wrapper {
+        .main-container {
             display: flex;
-            gap: 30px;
             align-items: flex-start;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .game-wrapper {
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 20px;
@@ -39,6 +44,7 @@
             border: 4px solid #DEB887;
             max-height: 95vh;
             margin: 10px;
+            flex: 1;
         }
 
         canvas {
@@ -49,6 +55,12 @@
 
         #game-container {
             text-align: center;
+        }
+        
+        #game-controls {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
         }
 
         #score-time {
@@ -62,6 +74,50 @@
             margin-top: 15px;
             color: #8B4513;
             font-size: 16px;
+        }
+
+        /* Mode selection styles */
+        #mode-selection {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #mode-selection h2, #multiplayer-options h2 {
+            color: #8B4513;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .mode-buttons, .multiplayer-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            min-width: 200px;
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            color: #8B4513;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #8B4513;
+            transition: all 0.2s;
+            font-family: 'Comic Neue', cursive;
+            font-weight: bold;
+        }
+        
+        .mode-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #8B4513;
+        }
+        
+        .mode-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #8B4513;
         }
 
         .multiplayer-controls {
@@ -172,6 +228,7 @@
             box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1);
             margin-top: 39px;
             overflow: hidden;
+            position: relative;
         }
 
         #leaderboard h2 {
@@ -200,102 +257,98 @@
         .leaderboard-entry span {
             display: flex;
             align-items: center;
-            gap: 8px;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
-        .leaderboard-entry span:last-child {
-            max-width: 60px;
-            justify-content: flex-end;
+        .leaderboard-entry .rank {
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 10px;
+            min-width: 30px;
+        }
+
+        .leaderboard-entry .player-name {
+            flex-grow: 1;
+            margin-right: 10px;
+            font-size: 16px;
+            text-align: left;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .leaderboard-entry .score {
+            font-weight: bold;
+            font-size: 18px;
+            color: #FF6347;
         }
 
         .leaderboard-entry:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
-        }
-
-        .leaderboard-entry:last-child {
-            border-bottom: none;
-        }
-
-        .rank {
-            font-weight: bold;
-            margin-right: 10px;
-            color: #CD853F;
-            font-size: 16px;
-            width: 30px;
-            text-align: center;
-        }
-
-        .leaderboard-entry {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            margin: 5px 0;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            border: 2px solid #DEB887;
-            transition: all 0.2s ease;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
         }
 
         .leaderboard-entry.highlight {
-            border-color: #FFD700;
-            background: linear-gradient(45deg, #FFD700 0%, #FFF8DC 100%);
-            animation: glow 1s ease-in-out infinite alternate;
+            animation: highlight 2s infinite;
         }
 
-        .score {
-            font-weight: bold;
-            color: #FF69B4;
-            min-width: 60px;
-            text-align: right;
+        @keyframes highlight {
+            0% {
+                background: rgba(255, 255, 255, 0.7);
+            }
+
+            50% {
+                background: rgba(255, 215, 0, 0.3);
+            }
+
+            100% {
+                background: rgba(255, 255, 255, 0.7);
+            }
         }
 
         .loading {
             text-align: center;
             color: #8B4513;
+            padding: 20px;
             font-style: italic;
-            padding: 10px;
         }
 
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700;
-            }
-
-            to {
-                box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
-            }
+        .game-button {
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            color: #8B4513;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #8B4513;
+            transition: all 0.2s;
+            font-family: 'Comic Neue', cursive;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 5px;
         }
 
-        #leaderboard-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin: 0;
-            padding: 0;
+        .game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #8B4513;
         }
 
-        #leaderboard-list::-webkit-scrollbar {
-            width: 8px;
+        .game-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #8B4513;
         }
 
-        #leaderboard-list::-webkit-scrollbar-track {
-            background: rgba(222, 184, 135, 0.1);
-            border-radius: 4px;
+        .game-button:disabled {
+            background: #CCCCCC;
+            color: #666666;
+            box-shadow: none;
+            cursor: not-allowed;
         }
 
-        #leaderboard-list::-webkit-scrollbar-thumb {
-            background: #DEB887;
-            border-radius: 4px;
-        }
-
-        #leaderboard-list::-webkit-scrollbar-thumb:hover {
-            background: #CD853F;
+        .game-title {
+            color: #8B4513;
+            margin: 0 0 20px 0;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.2);
         }
 
         .modal-overlay {
@@ -306,7 +359,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
+            z-index: 100;
         }
 
         #player-name-modal {
@@ -315,60 +368,19 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #fff8f8 0%, #fff2e6 100%);
-            padding: 30px 40px;
-            border-radius: 25px;
-            border: 6px solid #DEB887;
-            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            border: 4px solid #DEB887;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             z-index: 1000;
-            min-width: 320px;
-            box-shadow: 0 10px 40px rgba(139, 69, 19, 0.2);
-            animation: modalPop 0.3s ease-out;
-        }
-
-        @keyframes modalPop {
-            0% {
-                transform: translate(-50%, -50%) scale(0.8);
-                opacity: 0;
-            }
-
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-
-        #player-name-modal::before {
-            content: '🥚';
-            font-size: 40px;
-            display: block;
-            margin-bottom: 15px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
+            text-align: center;
+            min-width: 300px;
         }
 
         #player-name-modal h3 {
             color: #8B4513;
-            font-size: 28px;
-            margin: 0 0 15px 0;
-            text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.1);
-        }
-
-        #player-name-modal p {
-            color: #8B4513;
-            margin: 0 0 20px 0;
-            font-size: 18px;
+            margin-top: 0;
         }
 
         #player-name-modal input {
@@ -376,127 +388,75 @@
             padding: 15px 20px;
             width: 100%;
             border: 3px solid #DEB887;
-            border-radius: 15px;
-            font-size: 18px;
+            border-radius: 10px;
+            font-size: 16px;
             box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.9);
             font-family: 'Comic Neue', cursive;
-            transition: all 0.3s ease;
-        }
-
-        #player-name-modal input:focus {
-            outline: none;
-            border-color: #CD853F;
-            box-shadow: 0 0 15px rgba(205, 133, 63, 0.3);
-            transform: translateY(-2px);
         }
 
         #player-name-modal button {
-            background: linear-gradient(to bottom, #DEB887, #CD853F);
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            color: #8B4513;
             border: none;
-            padding: 15px 35px;
-            border-radius: 25px;
-            color: white;
+            padding: 12px 25px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 18px;
+            box-shadow: 0 4px 0 #8B4513;
+            transition: all 0.2s;
+            font-family: 'Comic Neue', cursive;
             font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(205, 133, 63, 0.2);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 10px;
+            font-size: 16px;
         }
 
         #player-name-modal button:hover {
-            background: linear-gradient(to bottom, #CD853F, #8B4513);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(205, 133, 63, 0.3);
+            box-shadow: 0 6px 0 #8B4513;
         }
 
-        .game-button {
-            background: linear-gradient(to bottom, #DEB887, #CD853F);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            font-size: 20px;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(205, 133, 63, 0.2);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .game-button:hover {
-            background: linear-gradient(to bottom, #CD853F, #8B4513);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(205, 133, 63, 0.3);
-        }
-
-        #game-controls {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .game-title {
-            font-size: 32px;
-            color: #8B4513;
-            text-align: center;
-            margin: 0 0 15px 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        #player-name-modal button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #8B4513;
         }
 
         .easter-egg {
             position: absolute;
             width: 30px;
             height: 40px;
-            background: linear-gradient(45deg, #FFB6C1, #87CEEB, #98FB98, #DDA0DD);
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            animation: float 3s ease-in-out infinite;
+            transform: rotate(-20deg);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: -1;
         }
 
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
+        .easter-egg::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 20%;
+            height: 20%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
         }
 
-        @keyframes floatUp {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
+        .easter-egg::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            width: 15%;
+            height: 15%;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
         }
 
-        #gameCanvas {
-            display: none;
+        canvas {
             border: 4px solid #DEB887;
+            background-color: #E8F5E9;
             border-radius: 10px;
-            background: #98FB98;
         }
-
-        #score-time {
-            display: none;
-        }
-
-        #game-container {
-            position: relative;
-        }
-
+        
         #countdown-overlay {
             display: none;
             position: absolute;
@@ -514,6 +474,7 @@
             z-index: 10;
             text-align: center;
             animation: scaleIn 0.5s ease-out;
+            pointer-events: none; /* Allow clicks to pass through */
             width: 100%;
         }
 
@@ -537,28 +498,50 @@
 </head>
 
 <body>
-    <div class="game-wrapper">
-        <div class="easter-egg" style="top: 20px; left: 20px;"></div>
-        <div class="easter-egg" style="top: 40px; right: 30px;"></div>
-        <div class="easter-egg" style="bottom: 30px; left: 40px;"></div>
-        <div class="easter-egg" style="bottom: 50px; right: 20px;"></div>
-        <div id="game-container">
-            <h1 class="game-title">🐰 Easter Egg Hunt 🥚</h1>
-            <div id="score-time">
-                Score: <span id="score">0</span> | Time: <span id="time">60</span>s
+    <div class="main-container">
+        <div class="game-wrapper">
+            <div class="easter-egg" style="top: 20px; left: 20px;"></div>
+            <div class="easter-egg" style="top: 40px; right: 30px;"></div>
+            <div class="easter-egg" style="bottom: 30px; left: 40px;"></div>
+            <div class="easter-egg" style="bottom: 50px; right: 20px;"></div>
+            <div id="game-container">
+                <h1 class="game-title">🐰 Easter Egg Hunt 🥚</h1>
+            
+            <!-- Game Mode Selection -->
+            <div id="mode-selection">
+                <h2>Select Game Mode</h2>
+                <div class="mode-buttons">
+                    <button id="singlePlayerMode" class="mode-button">🥚 Single Player</button>
+                    <button id="multiplayerMode" class="mode-button">👥 Multiplayer</button>
+                </div>
             </div>
-            <canvas id="gameCanvas" width="640" height="480"></canvas>
-            <div id="countdown-overlay"></div>
-            <div id="game-controls">
-                <button id="startButton" class="game-button">Start Game</button>
-                <button id="restartButton" class="game-button" style="display: none;">Play Again</button>
+            
+            <!-- Game UI -->
+            <div id="game-ui" style="display: none;">
+                <div id="score-time">
+                    Score: <span id="score">0</span> | Time: <span id="time">60</span>s
+                </div>
+                <div style="position: relative; width: 640px; margin: 0 auto;">
+                    <canvas id="gameCanvas" width="640" height="480"></canvas>
+                    <div id="countdown-overlay"></div>
+                </div>
+                <div id="game-controls">
+                    <button id="startButton" class="game-button">Start Game</button>
+                    <button id="restartButton" class="game-button" style="display: none;">Play Again</button>
+                </div>
+                <div id="instructions">
+                    Use arrow keys to move • Collect eggs • Avoid trees
+                </div>
             </div>
-            <div id="instructions">
-                Use arrow keys to move • Collect eggs • Avoid trees
-            </div>
-            <div class="multiplayer-controls">
-                <button id="createSessionButton" class="game-button">Create Multiplayer Game</button>
-                <button id="joinSessionButton" class="game-button">Join Game</button>
+            
+            <!-- Multiplayer Options -->
+            <div id="multiplayer-options" style="display: none;">
+                <h2>Multiplayer Mode</h2>
+                <div class="multiplayer-buttons">
+                    <button id="createSessionButton" class="game-button">Create Game</button>
+                    <button id="joinSessionButton" class="game-button">Join Game</button>
+                </div>
+                <button id="backToModeSelection" class="game-button">Back to Mode Selection</button>
             </div>
             <div id="session-info">
                 <h3>Multiplayer Session</h3>
@@ -577,13 +560,14 @@
                 <button class="game-button" onclick="location.reload()">Play Again</button>
             </div>
         </div>
-        <div id="leaderboard">
-            <h2>🏆 Leaderboard</h2>
-            <div id="leaderboard-entries" class="leaderboard-list">
-                <div class="loading">Loading scores...</div>
-            </div>
+    </div>
+    <div id="leaderboard" style="display: none;">
+        <h2>🏆 Leaderboard</h2>
+        <div id="leaderboard-entries" class="leaderboard-list">
+            <div class="loading">Loading scores...</div>
         </div>
     </div>
+</div>
     <div class="modal-overlay"></div>
     <div id="player-name-modal">
         <h3>New High Score!</h3>
@@ -617,6 +601,33 @@
     <script>
         const multiplayer = new MultiplayerManager();
         window.isMultiplayerMode = false;
+        
+        // Mode selection handlers
+        document.getElementById('singlePlayerMode').addEventListener('click', () => {
+            window.isMultiplayerMode = false;
+            document.getElementById('mode-selection').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'block';
+            document.getElementById('leaderboard').style.display = 'block';
+            // Show the regular start button in single player mode
+            document.getElementById('startButton').style.display = 'block';
+            // Initialize leaderboard for single player mode
+            updateLeaderboard();
+        });
+        
+        document.getElementById('multiplayerMode').addEventListener('click', () => {
+            window.isMultiplayerMode = true;
+            document.getElementById('mode-selection').style.display = 'none';
+            document.getElementById('multiplayer-options').style.display = 'block';
+            document.getElementById('leaderboard').style.display = 'none';
+        });
+        
+        document.getElementById('backToModeSelection').addEventListener('click', () => {
+            window.isMultiplayerMode = false;
+            document.getElementById('mode-selection').style.display = 'block';
+            document.getElementById('multiplayer-options').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'none';
+            document.getElementById('session-info').style.display = 'none';
+        });
 
         document.getElementById('createSessionButton').addEventListener('click', async () => {
             const name = prompt('Enter your name:');
@@ -627,12 +638,14 @@
             await multiplayer.setPlayerName(name);
 
             // Show session info and copy link
-            const sessionLink = `${window.location.href}?session=${sessionId}`;
+            const sessionLink = `${window.location.href.split('?')[0]}?session=${sessionId}`;
             document.getElementById('session-link').textContent = sessionLink;
             document.getElementById('session-info').style.display = 'block';
             document.getElementById('startMultiplayerButton').style.display = 'block';
-            document.getElementById('createSessionButton').style.display = 'none';
-            document.getElementById('joinSessionButton').style.display = 'none';
+            document.getElementById('multiplayer-options').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'block';
+            // Hide the regular start button in multiplayer mode
+            document.getElementById('startButton').style.display = 'none';
         });
 
         document.getElementById('joinSessionButton').addEventListener('click', async () => {
@@ -649,8 +662,10 @@
 
                 document.getElementById('session-info').style.display = 'block';
                 document.getElementById('readyButton').style.display = 'block';
-                document.getElementById('createSessionButton').style.display = 'none';
-                document.getElementById('joinSessionButton').style.display = 'none';
+                document.getElementById('multiplayer-options').style.display = 'none';
+                document.getElementById('game-ui').style.display = 'block';
+                // Hide the regular start button in multiplayer mode
+                document.getElementById('startButton').style.display = 'none';
             } catch (error) {
                 alert(error.message);
             }
@@ -686,11 +701,14 @@
 
                     window.isMultiplayerMode = true;
                     await multiplayer.setPlayerName(name);
-
+                    
+                    // Hide mode selection and show multiplayer UI
+                    document.getElementById('mode-selection').style.display = 'none';
+                    document.getElementById('game-ui').style.display = 'block';
                     document.getElementById('session-info').style.display = 'block';
                     document.getElementById('readyButton').style.display = 'block';
-                    document.getElementById('createSessionButton').style.display = 'none';
-                    document.getElementById('joinSessionButton').style.display = 'none';
+                    document.getElementById('multiplayer-controls').style.display = 'none';
+                    document.getElementById('leaderboard').style.display = 'none';
                 } catch (error) {
                     alert('Error joining session: ' + error.message);
                 }
@@ -699,7 +717,7 @@
 
         window.addEventListener('beforeunload', () => {
             if (isMultiplayerMode) {
-                multiplayer.cleanup();
+                multiplayer.leaveSession();
             }
         });
     </script>
