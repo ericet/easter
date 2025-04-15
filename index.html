@@ -64,6 +64,101 @@
             font-size: 16px;
         }
 
+        .multiplayer-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        #session-info {
+            display: none;
+            margin: 15px auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 2px solid #DEB887;
+            text-align: center;
+        }
+
+        #players-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+        }
+
+        .player-item .status {
+            margin-left: 10px;
+        }
+
+        #results-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border: 4px solid #DEB887;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            min-width: 300px;
+        }
+
+        #results-list {
+            margin-top: 15px;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #DEB887;
+        }
+
+        .result-item .place {
+            font-weight: bold;
+            margin-right: 15px;
+            color: #8B4513;
+        }
+
+        .result-item .name {
+            flex-grow: 1;
+        }
+
+        .result-item .score {
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .result-item .crown {
+            margin-left: 10px;
+            font-size: 24px;
+        }
+
+        .copy-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #8B4513;
+            text-decoration: underline;
+            padding: 5px;
+        }
+
+        .copy-link:hover {
+            color: #A0522D;
+        }
+
         #leaderboard {
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
@@ -461,6 +556,26 @@
             <div id="instructions">
                 Use arrow keys to move • Collect eggs • Avoid trees
             </div>
+            <div class="multiplayer-controls">
+                <button id="createSessionButton" class="game-button">Create Multiplayer Game</button>
+                <button id="joinSessionButton" class="game-button">Join Game</button>
+            </div>
+            <div id="session-info">
+                <h3>Multiplayer Session</h3>
+                <p>Share this link with other players:</p>
+                <p>
+                    <span id="session-link"></span>
+                    <button class="copy-link" onclick="copySessionLink()">📋 Copy</button>
+                </p>
+                <div id="players-list"></div>
+                <button id="readyButton" class="game-button" style="display: none;">Ready</button>
+                <button id="startMultiplayerButton" class="game-button" style="display: none;" disabled>Start Game</button>
+            </div>
+            <div id="results-modal">
+                <h2>Game Results 🏆</h2>
+                <div id="results-list"></div>
+                <button class="game-button" onclick="location.reload()">Play Again</button>
+            </div>
         </div>
         <div id="leaderboard">
             <h2>🏆 Leaderboard</h2>
@@ -497,7 +612,97 @@
         firebase.initializeApp(firebaseConfig);
     </script>
 
+    <script src="multiplayer.js"></script>
     <script src="game.js"></script>
+    <script>
+        const multiplayer = new MultiplayerManager();
+        window.isMultiplayerMode = false;
+
+        document.getElementById('createSessionButton').addEventListener('click', async () => {
+            const name = prompt('Enter your name:');
+            if (!name) return;
+
+            window.isMultiplayerMode = true;
+            const sessionId = await multiplayer.createSession();
+            await multiplayer.setPlayerName(name);
+
+            // Show session info and copy link
+            const sessionLink = `${window.location.href}?session=${sessionId}`;
+            document.getElementById('session-link').textContent = sessionLink;
+            document.getElementById('session-info').style.display = 'block';
+            document.getElementById('startMultiplayerButton').style.display = 'block';
+            document.getElementById('createSessionButton').style.display = 'none';
+            document.getElementById('joinSessionButton').style.display = 'none';
+        });
+
+        document.getElementById('joinSessionButton').addEventListener('click', async () => {
+            const sessionId = prompt('Enter session ID:');
+            if (!sessionId) return;
+
+            try {
+                await multiplayer.joinSession(sessionId);
+                const name = prompt('Enter your name:');
+                if (!name) return;
+
+                window.isMultiplayerMode = true;
+                await multiplayer.setPlayerName(name);
+
+                document.getElementById('session-info').style.display = 'block';
+                document.getElementById('readyButton').style.display = 'block';
+                document.getElementById('createSessionButton').style.display = 'none';
+                document.getElementById('joinSessionButton').style.display = 'none';
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        document.getElementById('readyButton').addEventListener('click', async () => {
+            const button = document.getElementById('readyButton');
+            const isReady = button.textContent === 'Ready';
+            await multiplayer.setPlayerReady(isReady);
+            button.textContent = isReady ? 'Not Ready' : 'Ready';
+        });
+
+        document.getElementById('startMultiplayerButton').addEventListener('click', () => {
+            multiplayer.startMultiplayerGame();
+        });
+
+        function copySessionLink() {
+            const link = document.getElementById('session-link').textContent;
+            navigator.clipboard.writeText(link);
+            alert('Link copied to clipboard!');
+        }
+
+        // Check for session ID in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        if (sessionId) {
+            // Auto-join session from URL
+            (async () => {
+                try {
+                    await multiplayer.joinSession(sessionId);
+                    const name = prompt('Enter your name:');
+                    if (!name) return;
+
+                    window.isMultiplayerMode = true;
+                    await multiplayer.setPlayerName(name);
+
+                    document.getElementById('session-info').style.display = 'block';
+                    document.getElementById('readyButton').style.display = 'block';
+                    document.getElementById('createSessionButton').style.display = 'none';
+                    document.getElementById('joinSessionButton').style.display = 'none';
+                } catch (error) {
+                    alert('Error joining session: ' + error.message);
+                }
+            })();
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (isMultiplayerMode) {
+                multiplayer.cleanup();
+            }
+        });
+    </script>
 </body>
 
 </html>

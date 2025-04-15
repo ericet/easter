@@ -303,9 +303,16 @@ class Game {
         }
         
         // Hide overlay and start game
-        overlay.style.display = 'none';
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
         
-        // Start the game immediately
+        // Hide single player controls in multiplayer mode
+        if (window.isMultiplayerMode) {
+            document.getElementById('startButton').style.display = 'none';
+        }
+        
+        // Start the game
         this.canvas.style.display = 'block';
         document.getElementById('score-time').style.display = 'block';
         this.gameStarted = true;
@@ -330,22 +337,26 @@ class Game {
         this.gameOver = true;
         clearInterval(this.timer);
         window.lastScore = this.score;
-        document.getElementById('restartButton').style.display = 'block';
         
-        const isHighScore = await checkHighScore(this.score);
-        if (isHighScore) {
-            const modal = document.getElementById('player-name-modal');
-            const overlay = document.querySelector('.modal-overlay');
-            const nameInput = document.getElementById('player-name');
-            const finalScoreSpan = modal.querySelector('.final-score');
-            
-            finalScoreSpan.textContent = this.score;
-            modal.style.display = 'block';
-            overlay.style.display = 'block';
-            nameInput.value = '';
-            nameInput.focus();
+        if (isMultiplayerMode) {
+            await multiplayer.submitScore(this.score);
         } else {
-            alert(`Game Over! Final Score: ${this.score}`);
+            document.getElementById('restartButton').style.display = 'block';
+            const isHighScore = await checkHighScore(this.score);
+            if (isHighScore) {
+                const modal = document.getElementById('player-name-modal');
+                const overlay = document.querySelector('.modal-overlay');
+                const nameInput = document.getElementById('player-name');
+                const finalScoreSpan = modal.querySelector('.final-score');
+                
+                finalScoreSpan.textContent = this.score;
+                modal.style.display = 'block';
+                overlay.style.display = 'block';
+                nameInput.value = '';
+                nameInput.focus();
+            } else {
+                alert(`Game Over! Final Score: ${this.score}`);
+            }
         }
     }
 
@@ -991,5 +1002,5 @@ class Game {
 
 // Initialize game when the page loads
 window.onload = () => {
-    new Game();
+    window.gameInstance = new Game();
 };
