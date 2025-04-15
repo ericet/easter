@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easter Egg Hunt</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #FFE4E1 0%, #FFB6C1 100%);
+            font-family: 'Comic Neue', cursive;
+            background-image:
+                radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.2) 2%, transparent 0%),
+                radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.2) 2%, transparent 0%);
+            background-size: 100px 100px;
+        }
+
+        .game-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1);
+            border: 4px solid #DEB887;
+            max-height: 95vh;
+            margin: 10px;
+        }
+
+        canvas {
+            border: 4px solid #DEB887;
+            background-color: #E8F5E9;
+            border-radius: 10px;
+        }
+
+        #game-container {
+            text-align: center;
+        }
+
+        #score-time {
+            margin-bottom: 15px;
+            font-size: 24px;
+            color: #8B4513;
+            font-weight: bold;
+        }
+
+        #instructions {
+            margin-top: 15px;
+            color: #8B4513;
+            font-size: 16px;
+        }
+
+        #leaderboard {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            border: 4px solid #DEB887;
+            width: 250px;
+            height: 480px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1);
+            margin-top: 39px;
+            overflow: hidden;
+        }
+
+        #leaderboard h2 {
+            color: #8B4513;
+            margin: 0 0 15px 0;
+            font-size: 24px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.1);
+            padding-bottom: 10px;
+            border-bottom: 2px solid #DEB887;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            color: #8B4513;
+            transition: transform 0.2s, box-shadow 0.2s;
+            word-break: break-word;
+        }
+
+        .leaderboard-entry span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .leaderboard-entry span:last-child {
+            max-width: 60px;
+            justify-content: flex-end;
+        }
+
+        .leaderboard-entry:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #CD853F;
+            font-size: 16px;
+            width: 30px;
+            text-align: center;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 2px solid #DEB887;
+            transition: all 0.2s ease;
+        }
+
+        .leaderboard-entry.highlight {
+            border-color: #FFD700;
+            background: linear-gradient(45deg, #FFD700 0%, #FFF8DC 100%);
+            animation: glow 1s ease-in-out infinite alternate;
+        }
+
+        .score {
+            font-weight: bold;
+            color: #FF69B4;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .loading {
+            text-align: center;
+            color: #8B4513;
+            font-style: italic;
+            padding: 10px;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700;
+            }
+
+            to {
+                box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
+            }
+        }
+
+        #leaderboard-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+        }
+
+        #leaderboard-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #leaderboard-list::-webkit-scrollbar-track {
+            background: rgba(222, 184, 135, 0.1);
+            border-radius: 4px;
+        }
+
+        #leaderboard-list::-webkit-scrollbar-thumb {
+            background: #DEB887;
+            border-radius: 4px;
+        }
+
+        #leaderboard-list::-webkit-scrollbar-thumb:hover {
+            background: #CD853F;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        #player-name-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #fff8f8 0%, #fff2e6 100%);
+            padding: 30px 40px;
+            border-radius: 25px;
+            border: 6px solid #DEB887;
+            text-align: center;
+            z-index: 1000;
+            min-width: 320px;
+            box-shadow: 0 10px 40px rgba(139, 69, 19, 0.2);
+            animation: modalPop 0.3s ease-out;
+        }
+
+        @keyframes modalPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        #player-name-modal::before {
+            content: '🥚';
+            font-size: 40px;
+            display: block;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        #player-name-modal h3 {
+            color: #8B4513;
+            font-size: 28px;
+            margin: 0 0 15px 0;
+            text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.1);
+        }
+
+        #player-name-modal p {
+            color: #8B4513;
+            margin: 0 0 20px 0;
+            font-size: 18px;
+        }
+
+        #player-name-modal input {
+            margin: 10px 0 20px;
+            padding: 15px 20px;
+            width: 100%;
+            border: 3px solid #DEB887;
+            border-radius: 15px;
+            font-size: 18px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Comic Neue', cursive;
+            transition: all 0.3s ease;
+        }
+
+        #player-name-modal input:focus {
+            outline: none;
+            border-color: #CD853F;
+            box-shadow: 0 0 15px rgba(205, 133, 63, 0.3);
+            transform: translateY(-2px);
+        }
+
+        #player-name-modal button {
+            background: linear-gradient(to bottom, #DEB887, #CD853F);
+            border: none;
+            padding: 15px 35px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(205, 133, 63, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        #player-name-modal button:hover {
+            background: linear-gradient(to bottom, #CD853F, #8B4513);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(205, 133, 63, 0.3);
+        }
+
+        .game-button {
+            background: linear-gradient(to bottom, #DEB887, #CD853F);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(205, 133, 63, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-button:hover {
+            background: linear-gradient(to bottom, #CD853F, #8B4513);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(205, 133, 63, 0.3);
+        }
+
+        #game-controls {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .game-title {
+            font-size: 32px;
+            color: #8B4513;
+            text-align: center;
+            margin: 0 0 15px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .easter-egg {
+            position: absolute;
+            width: 30px;
+            height: 40px;
+            background: linear-gradient(45deg, #FFB6C1, #87CEEB, #98FB98, #DDA0DD);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        #gameCanvas {
+            display: none;
+            border: 4px solid #DEB887;
+            border-radius: 10px;
+            background: #98FB98;
+        }
+
+        #score-time {
+            display: none;
+        }
+
+        #game-container {
+            position: relative;
+        }
+
+        #countdown-overlay {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            font-weight: bold;
+            color: #8B4513;
+            text-shadow:
+                3px 3px 0 #FFF,
+                -3px -3px 0 #FFF,
+                3px -3px 0 #FFF,
+                -3px 3px 0 #FFF;
+            z-index: 10;
+            text-align: center;
+            animation: scaleIn 0.5s ease-out;
+            width: 100%;
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-wrapper">
+        <div class="easter-egg" style="top: 20px; left: 20px;"></div>
+        <div class="easter-egg" style="top: 40px; right: 30px;"></div>
+        <div class="easter-egg" style="bottom: 30px; left: 40px;"></div>
+        <div class="easter-egg" style="bottom: 50px; right: 20px;"></div>
+        <div id="game-container">
+            <h1 class="game-title">🐰 Easter Egg Hunt 🥚</h1>
+            <div id="score-time">
+                Score: <span id="score">0</span> | Time: <span id="time">60</span>s
+            </div>
+            <canvas id="gameCanvas" width="640" height="480"></canvas>
+            <div id="countdown-overlay"></div>
+            <div id="game-controls">
+                <button id="startButton" class="game-button">Start Game</button>
+                <button id="restartButton" class="game-button" style="display: none;">Play Again</button>
+            </div>
+            <div id="instructions">
+                Use arrow keys to move • Collect eggs • Avoid trees
+            </div>
+        </div>
+        <div id="leaderboard">
+            <h2>🏆 Leaderboard</h2>
+            <div id="leaderboard-entries" class="leaderboard-list">
+                <div class="loading">Loading scores...</div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay"></div>
+    <div id="player-name-modal">
+        <h3>New High Score!</h3>
+        <p>Congratulations! You collected <span class="final-score"></span> eggs!</p>
+        <input type="text" id="player-name" maxlength="15" placeholder="Enter your name here...">
+        <button onclick="submitScore()">Save Score</button>
+    </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <!-- Initialize Firebase -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWARXsnkkNcH5ettb4-VLd-e3F_9J2e_o",
+            authDomain: "easter-bunny-8e9eb.firebaseapp.com",
+            databaseURL: "https://easter-bunny-8e9eb-default-rtdb.firebaseio.com",
+            projectId: "easter-bunny-8e9eb",
+            storageBucket: "easter-bunny-8e9eb.firebasestorage.app",
+            messagingSenderId: "724627705535",
+            appId: "1:724627705535:web:6e1708acc946ceff6d400a",
+            measurementId: "G-H1SY4GT9KY"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script src="game.js"></script>
+</body>
+
+</html>
