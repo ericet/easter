@@ -78,7 +78,7 @@ function submitScore() {
             })
             .catch(error => {
                 console.error('Error saving score:', error);
-                alert('Failed to save score. Please try again.');
+                window.showNotification('Failed to save score. Please try again.', '🐰 Error 🐰', '⚠️');
             });
 }
 
@@ -538,7 +538,7 @@ class Game {
                 nameInput.value = '';
                 nameInput.focus();
             } else {
-                alert(`Game Over! Final Score: ${this.score}`);
+                window.showNotification(`Game Over! Final Score: ${this.score}`, '🐰 Game Over 🐰', '🏆');
             }
         }
     }

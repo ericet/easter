@@ -622,7 +622,7 @@ class MultiplayerManager {
             }
         } catch (error) {
             console.error('Error restarting session:', error);
-            alert('Failed to restart session: ' + error.message);
+            window.showNotification('Failed to restart session: ' + error.message, '🐰 Session Error 🐰', '⚠️');
         }
     }
 }

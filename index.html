@@ -1348,6 +1348,23 @@
             </div>
         </div>
     </div>
+    
+    <!-- Notification Modal -->
+    <div id="notification-modal" class="modal" style="display: none;">
+        <div class="modal-content easter-notification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 400px; width: 90%; margin: 0; background: linear-gradient(to bottom, #FFF8E1, #FFECB3); border: 4px solid #DEB887; border-radius: 15px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); padding: 20px;">
+            <div class="modal-header" style="position: relative; margin-bottom: 15px;">
+                <h2 id="notification-title" style="margin-top: 0; margin-bottom: 10px; text-align: center;">🐰 Notification 🐰</h2>
+                <span id="close-notification" class="close" style="position: absolute; top: 0; right: 0; font-size: 24px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="notification-container" style="width: 100%; box-sizing: border-box;">
+                    <div class="notification-icon" style="text-align: center; font-size: 28px; margin-bottom: 10px;">💬</div>
+                    <p id="notification-message" style="text-align: center; margin-bottom: 15px;">Message goes here</p>
+                    <button id="notification-ok" class="game-button" style="display: block; margin: 0 auto;">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -1382,6 +1399,39 @@
         
         function hideHowToPlay() {
             document.getElementById('how-to-play-modal').style.display = 'none';
+        }
+        
+        // Show notification modal to replace alerts - make it globally available
+        window.showNotification = function(message, title = '🐰 Notification 🐰', icon = '💬') {
+            const modal = document.getElementById('notification-modal');
+            const titleElement = document.getElementById('notification-title');
+            const messageElement = document.getElementById('notification-message');
+            const iconElement = document.querySelector('#notification-modal .notification-icon');
+            const okButton = document.getElementById('notification-ok');
+            
+            // Set content
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            iconElement.textContent = icon;
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Handle OK button click
+            const handleOk = () => {
+                modal.style.display = 'none';
+                okButton.removeEventListener('click', handleOk);
+                document.getElementById('close-notification').removeEventListener('click', handleOk);
+            };
+            
+            // Add event listeners
+            okButton.addEventListener('click', handleOk);
+            document.getElementById('close-notification').addEventListener('click', handleOk);
+        };
+        
+        // Local alias for convenience
+        function showNotification(message, title = '🐰 Notification 🐰', icon = '💬') {
+            window.showNotification(message, title, icon);
         }
         
         // Add event listeners for all How to Play buttons
@@ -1522,7 +1572,7 @@
             });
         }
         
-        // Show session ID input modal
+        // Show session input modal for joining a game
         function showSessionInputModal(callback) {
             const modal = document.getElementById('session-input-modal');
             const inputElement = document.getElementById('session-id-input');
@@ -1610,7 +1660,7 @@
                         document.getElementById('startButton').style.display = 'none';
                     }, '🐰 Join Game Session 🐰', 'Please enter your name to join the game:', 'Join Game');
                 } catch (error) {
-                    showNotification(error.message, '🐰 Session Error');
+                    showNotification(error.message, '🐰 Session Error 🐰', '⚠️');
                 }
             });
         });
@@ -1625,12 +1675,6 @@
         document.getElementById('startMultiplayerButton').addEventListener('click', () => {
             multiplayer.startMultiplayerGame();
         });
-
-        function copySessionLink() {
-            const link = document.getElementById('session-link').textContent;
-            navigator.clipboard.writeText(link);
-            alert('Link copied to clipboard!');
-        }
 
         // Leaderboard toggle functionality (mobile only)
         const toggleLeaderboardBtn = document.getElementById('toggle-leaderboard');
@@ -1756,11 +1800,23 @@
                     safeSetDisplay('startButton', 'none'); // Hide single-player start button
                 } catch (error) {
                     console.error('Session join error:', error);
-                    alert('Error joining session: ' + error.message);
+                    showNotification('Error joining session: ' + error.message, '🐰 Session Error 🐰', '⚠️');
                 }
             })();
         }
 
+        // Function to copy session link to clipboard
+        window.copySessionLink = function() {
+            const link = document.getElementById('session-link').textContent;
+            navigator.clipboard.writeText(link)
+                .then(() => {
+                    window.showNotification('Link copied to clipboard!', '🐰 Success 🐰', '📋');
+                })
+                .catch(err => {
+                    window.showNotification('Failed to copy link: ' + err, '🐰 Error 🐰', '⚠️');
+                });
+        };
+        
         window.addEventListener('beforeunload', () => {
             if (isMultiplayerMode) {
                 multiplayer.leaveSession();
