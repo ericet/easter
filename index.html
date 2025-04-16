@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Easter Egg Hunt</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg">
     <link rel="alternate icon" href="assets/favicon/favicon.ico">
@@ -32,27 +32,77 @@
 
         .main-container {
             display: flex;
-            align-items: flex-start;
-            gap: 30px;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
         }
         
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 30px;
+            }
+        }
+        
         .game-wrapper {
             background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
+            padding: 15px;
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1);
             border: 4px solid #DEB887;
             max-height: 95vh;
-            margin: 10px;
+            margin: 5px;
             flex: 1;
+            width: calc(100% - 30px);
+            max-width: 800px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 767px) {
+            .game-wrapper {
+                padding: 10px;
+                max-height: none;
+                height: auto;
+                margin: 0;
+                width: 100%;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+            
+            body {
+                padding: 0;
+                overflow-y: auto;
+            }
+            
+            .main-container {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .game-wrapper {
+                padding: 20px;
+                margin: 10px;
+                width: auto;
+            }
         }
 
         canvas {
             border: 4px solid #DEB887;
             background-color: #E8F5E9;
             border-radius: 10px;
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+            display: block;
+            margin: 0 auto;
         }
 
         #game-container {
@@ -61,8 +111,32 @@
         
         #game-controls {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 10px;
             margin: 15px 0;
+        }
+        
+        @media (max-width: 767px) {
+            #game-controls {
+                margin: 10px 0;
+            }
+            
+            .game-button {
+                padding: 8px 15px;
+                font-size: 14px;
+                margin: 3px;
+            }
+            
+            #score-time {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+            
+            #instructions, .mobile-instructions {
+                font-size: 14px;
+                margin: 8px 0;
+            }
         }
 
         #score-time {
@@ -76,6 +150,22 @@
             margin-top: 15px;
             color: #8B4513;
             font-size: 16px;
+        }
+
+        .mobile-instructions {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            color: #8B4513;
+        }
+        
+        @media (max-width: 767px) {
+            .mobile-instructions {
+                display: block;
+            }
         }
 
         /* Mode selection styles */
@@ -92,9 +182,17 @@
         
         .mode-buttons, .multiplayer-buttons {
             display: flex;
-            gap: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
             justify-content: center;
             margin-bottom: 20px;
+        }
+        
+        @media (max-width: 480px) {
+            .mode-buttons, .multiplayer-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
         }
         
         .game-preview {
@@ -111,9 +209,9 @@
         }
         
         .mode-button {
-            padding: 15px 30px;
-            font-size: 18px;
-            min-width: 200px;
+            padding: 15px 20px;
+            font-size: 16px;
+            min-width: 180px;
             background: linear-gradient(to bottom, #FFD700, #FFA500);
             color: #8B4513;
             border: none;
@@ -123,6 +221,15 @@
             transition: all 0.2s;
             font-family: 'Comic Neue', cursive;
             font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        @media (min-width: 768px) {
+            .mode-button {
+                padding: 15px 30px;
+                font-size: 18px;
+                min-width: 200px;
+            }
         }
         
         .mode-button:hover {
@@ -175,10 +282,10 @@
         #chat-container {
             display: none;
             position: fixed;
-            right: 20px;
-            bottom: 20px;
-            width: 300px;
-            height: 400px;
+            right: 10px;
+            bottom: 10px;
+            width: 280px;
+            height: 350px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             border: 4px solid #FFB6C1; /* Light pink for Easter */
@@ -187,6 +294,15 @@
             display: flex;
             flex-direction: column;
             background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.95), rgba(255, 240, 245, 0.95));
+        }
+        
+        @media (min-width: 768px) {
+            #chat-container {
+                right: 20px;
+                bottom: 20px;
+                width: 300px;
+                height: 400px;
+            }
         }
 
         #chat-header {
@@ -424,15 +540,80 @@
             overflow: hidden;
             position: relative;
         }
+        
+        /* Leaderboard header with toggle button */
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #DEB887;
+        }
+        
+        .toggle-button {
+            background: none;
+            border: none;
+            color: #8B4513;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 5px;
+            line-height: 1;
+        }
+        
+        /* Mobile-only button to show leaderboard */
+        #show-leaderboard {
+            display: none;
+        }
+        
+        /* Mobile styles for leaderboard */
+        @media (max-width: 767px) {
+            #leaderboard {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 100;
+                width: 90%;
+                max-width: 300px;
+                max-height: 80vh;
+                overflow-y: auto;
+                margin-top: 0;
+                transform: translateX(110%);
+                transition: transform 0.3s ease-in-out;
+            }
+            
+            #leaderboard.visible {
+                transform: translateX(0);
+            }
+            
+            #show-leaderboard {
+                display: block;
+                position: fixed;
+                bottom: 10px;
+                right: 10px;
+                z-index: 99;
+            }
+            
+            /* Hide toggle button in leaderboard header on mobile */
+            .leaderboard-header .toggle-button {
+                display: block;
+            }
+        }
+        
+        /* Desktop styles for leaderboard */
+        @media (min-width: 768px) {
+            /* Hide toggle button in leaderboard header on desktop */
+            .leaderboard-header .toggle-button {
+                display: none;
+            }
+        }
 
         #leaderboard h2 {
             color: #8B4513;
-            margin: 0 0 15px 0;
+            margin: 0;
             font-size: 24px;
-            text-align: center;
             text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.1);
-            padding-bottom: 10px;
-            border-bottom: 2px solid #DEB887;
+            padding-bottom: 0;
         }
 
         .leaderboard-entry {
@@ -719,13 +900,13 @@
             position: relative;
             background-color: white;
             margin: 5% auto;
-            padding: 25px;
-            width: 80%;
-            max-width: 800px;
+            padding: 20px;
             border-radius: 15px;
-            border: 4px solid #DEB887;
+            width: 90%;
+            max-width: 600px;
             box-shadow: 0 8px 32px rgba(139, 69, 19, 0.2);
-            max-height: 85vh;
+            border: 4px solid #DEB887;
+            max-height: 90vh;
             overflow-y: auto;
         }
         
@@ -887,7 +1068,7 @@
                 <div id="score-time">
                     Score: <span id="score">0</span> | Time: <span id="time">60</span>s
                 </div>
-                <div style="position: relative; width: 640px; margin: 0 auto;">
+                <div id="canvas-container" style="position: relative; max-width: 100%; margin: 0 auto;">
                     <canvas id="gameCanvas" width="640" height="480"></canvas>
                     <div id="countdown-overlay"></div>
                 </div>
@@ -899,6 +1080,9 @@
                 </div>
                 <div id="instructions">
                     Use arrow keys to move • Collect eggs • Avoid trees
+                </div>
+                <div class="mobile-instructions">
+                    <p>📱 Touch anywhere on the screen and drag to move the bunny</p>
                 </div>
             </div>
 
@@ -1058,11 +1242,15 @@
         </div>
     </div>
     <div id="leaderboard" style="display: none;">
-        <h2>🏆 Leaderboard</h2>
+        <div class="leaderboard-header">
+            <h2>🏆 Leaderboard</h2>
+            <button id="toggle-leaderboard" class="toggle-button">×</button>
+        </div>
         <div id="leaderboard-entries" class="leaderboard-list">
             <div class="loading">Loading scores...</div>
         </div>
     </div>
+    <button id="show-leaderboard" class="game-button mobile-only" style="display: none;">🏆 Show Leaderboard</button>
 </div>
     <div class="modal-overlay"></div>
     <div id="player-name-modal">
@@ -1131,6 +1319,7 @@
             document.getElementById('session-info').style.display = 'none';
             document.getElementById('mode-selection').style.display = 'block';
             document.getElementById('leaderboard').style.display = 'none';
+            document.getElementById('show-leaderboard').style.display = 'none';
             
             // Reset multiplayer state if needed
             window.isMultiplayerMode = false;
@@ -1149,6 +1338,22 @@
             document.getElementById('startButton').style.display = 'block';
             // Initialize leaderboard for single player mode
             updateLeaderboard();
+            
+            // Check if we're on mobile
+            if (window.innerWidth <= 767) {
+                // Hide leaderboard initially on mobile
+                document.getElementById('leaderboard').classList.remove('visible');
+                // Show the toggle button only on mobile
+                document.getElementById('show-leaderboard').style.display = 'block';
+            } else {
+                // On desktop: always show leaderboard normally (no toggle)
+                document.getElementById('show-leaderboard').style.display = 'none';
+                // Make sure leaderboard is displayed normally (not as a slide-in panel)
+                const leaderboard = document.getElementById('leaderboard');
+                if (leaderboard) {
+                    leaderboard.classList.remove('visible');
+                }
+            }
         });
         
         document.getElementById('multiplayerMode').addEventListener('click', () => {
@@ -1225,6 +1430,70 @@
             alert('Link copied to clipboard!');
         }
 
+        // Leaderboard toggle functionality (mobile only)
+        const toggleLeaderboardBtn = document.getElementById('toggle-leaderboard');
+        if (toggleLeaderboardBtn) {
+            toggleLeaderboardBtn.addEventListener('click', () => {
+                const leaderboard = document.getElementById('leaderboard');
+                const toggleBtn = document.getElementById('toggle-leaderboard');
+                
+                if (!leaderboard || !toggleBtn) return;
+                
+                // Only apply toggle functionality on mobile
+                if (window.innerWidth <= 767) {
+                    // On mobile, slide the leaderboard in/out
+                    if (leaderboard.classList.contains('visible')) {
+                        leaderboard.classList.remove('visible');
+                    } else {
+                        leaderboard.classList.add('visible');
+                    }
+                }
+            });
+        }
+        
+        // Show leaderboard button functionality (mobile only)
+        const showLeaderboardBtn = document.getElementById('show-leaderboard');
+        if (showLeaderboardBtn) {
+            showLeaderboardBtn.addEventListener('click', () => {
+                const leaderboard = document.getElementById('leaderboard');
+                const toggleBtn = document.getElementById('toggle-leaderboard');
+                
+                if (!leaderboard || !toggleBtn) return;
+                
+                leaderboard.classList.add('visible');
+                toggleBtn.textContent = '×';
+            });
+        }
+        
+        // Handle window resize to adjust leaderboard visibility
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            // Debounce the resize event to prevent performance issues
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const leaderboard = document.getElementById('leaderboard');
+                const showLeaderboardBtn = document.getElementById('show-leaderboard');
+                
+                if (leaderboard) {
+                    if (window.innerWidth > 767) {
+                        // On desktop: show leaderboard normally (not as a slide-in panel)
+                        leaderboard.classList.remove('visible');
+                        // Hide the mobile toggle button
+                        if (showLeaderboardBtn) {
+                            showLeaderboardBtn.style.display = 'none';
+                        }
+                    } else {
+                        // On mobile: hide leaderboard by default
+                        leaderboard.classList.remove('visible');
+                        // Show the mobile toggle button
+                        if (showLeaderboardBtn) {
+                            showLeaderboardBtn.style.display = 'block';
+                        }
+                    }
+                }
+            }, 200);
+        });
+        
         // Check for session ID in URL
         const urlParams = new URLSearchParams(window.location.search);
         const sessionId = urlParams.get('session');

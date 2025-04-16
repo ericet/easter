@@ -88,12 +88,54 @@ updateLeaderboard();
 class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
+        if (!this.canvas) {
+            console.error('Canvas element not found');
+            return;
+        }
+        
         this.ctx = this.canvas.getContext('2d');
+        
+        // Check if device is mobile
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Touch state for mobile controls
+        this.touchState = {
+            active: false,
+            startX: 0,
+            startY: 0,
+            currentX: 0,
+            currentY: 0
+        };
+        
+        // Virtual joystick properties
+        this.joystick = {
+            visible: false,
+            baseX: 0,
+            baseY: 0,
+            stickX: 0,
+            stickY: 0,
+            radius: this.isMobile ? 40 : 50, // Smaller radius on mobile
+            stickRadius: this.isMobile ? 20 : 25 // Smaller stick on mobile
+        };
+        
+        // Set default canvas size
+        this.canvas.width = 640;
+        this.canvas.height = 480;
+        
+        // Initialize game after setting up properties
         this.initializeGame();
 
         // Event listeners for game controls
-        document.getElementById('startButton').addEventListener('click', () => this.startGame());
-        document.getElementById('restartButton').addEventListener('click', () => this.restartGame());
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        
+        if (startButton) {
+            startButton.addEventListener('click', () => this.startGame());
+        }
+        
+        if (restartButton) {
+            restartButton.addEventListener('click', () => this.restartGame());
+        }
     }
 
     initializeGame() {
@@ -109,6 +151,9 @@ class Game {
         // Hide game canvas initially
         this.canvas.style.display = 'none';
         document.getElementById('score-time').style.display = 'block';
+        
+        // Set canvas size responsively
+        this.resizeCanvas();
         
         this.player = {
             x: this.canvas.width / 2,
@@ -134,11 +179,22 @@ class Game {
             ArrowDown: false
         };
 
-        // Event listeners
+        // Event listeners for keyboard
         this.boundHandleKeyDown = this.handleKeyDown.bind(this);
         this.boundHandleKeyUp = this.handleKeyUp.bind(this);
         window.addEventListener('keydown', this.boundHandleKeyDown);
         window.addEventListener('keyup', this.boundHandleKeyUp);
+        
+        // Event listeners for touch controls
+        this.boundHandleTouchStart = this.handleTouchStart.bind(this);
+        this.boundHandleTouchMove = this.handleTouchMove.bind(this);
+        this.boundHandleTouchEnd = this.handleTouchEnd.bind(this);
+        this.boundHandleResize = this.resizeCanvas.bind(this);
+        
+        this.canvas.addEventListener('touchstart', this.boundHandleTouchStart, { passive: false });
+        this.canvas.addEventListener('touchmove', this.boundHandleTouchMove, { passive: false });
+        this.canvas.addEventListener('touchend', this.boundHandleTouchEnd);
+        window.addEventListener('resize', this.boundHandleResize);
 
         // Create obstacles (trees)
         this.createObstacles();
@@ -186,6 +242,123 @@ class Game {
         if (this.keys.hasOwnProperty(e.key)) {
             this.keys[e.key] = false;
         }
+    }
+    
+    resizeCanvas() {
+        try {
+            // Get the canvas container dimensions
+            const container = document.getElementById('canvas-container');
+            
+            // Check if container exists
+            if (!container) {
+                console.warn('Canvas container not found');
+                return;
+            }
+            
+            const containerWidth = container.clientWidth || 640;
+            
+            // Calculate appropriate height based on aspect ratio (4:3)
+            const aspectRatio = 4/3;
+            const containerHeight = containerWidth / aspectRatio;
+            
+            // Set canvas size (with a max size to keep game playable)
+            const maxWidth = 640;
+            const maxHeight = 480;
+            
+            // Calculate the new dimensions while maintaining aspect ratio
+            let newWidth = Math.min(containerWidth, maxWidth);
+            let newHeight = Math.min(containerHeight, maxHeight);
+            
+            // Ensure we maintain aspect ratio if height is constrained
+            if (newHeight === maxHeight && newWidth > maxWidth) {
+                newWidth = maxHeight * aspectRatio;
+            }
+            
+            // Set canvas dimensions
+            this.canvas.width = newWidth;
+            this.canvas.height = newHeight;
+            
+            // Reposition player if needed
+            if (this.player) {
+                this.player.x = Math.min(this.player.x, this.canvas.width - this.player.width);
+                this.player.y = Math.min(this.player.y, this.canvas.height - this.player.height);
+            }
+        } catch (error) {
+            console.error('Error resizing canvas:', error);
+            // Set default canvas size if there's an error
+            this.canvas.width = 640;
+            this.canvas.height = 480;
+        }
+    }
+    
+    handleTouchStart(e) {
+        e.preventDefault();
+        
+        if (!this.gameStarted || this.gameOver) return;
+        
+        const touch = e.touches[0];
+        const rect = this.canvas.getBoundingClientRect();
+        
+        this.touchState.active = true;
+        this.touchState.startX = touch.clientX - rect.left;
+        this.touchState.startY = touch.clientY - rect.top;
+        this.touchState.currentX = this.touchState.startX;
+        this.touchState.currentY = this.touchState.startY;
+        
+        // Set up virtual joystick
+        this.joystick.visible = true;
+        this.joystick.baseX = this.touchState.startX;
+        this.joystick.baseY = this.touchState.startY;
+        this.joystick.stickX = this.touchState.startX;
+        this.joystick.stickY = this.touchState.startY;
+    }
+    
+    handleTouchMove(e) {
+        e.preventDefault();
+        
+        if (!this.touchState.active) return;
+        
+        const touch = e.touches[0];
+        const rect = this.canvas.getBoundingClientRect();
+        
+        this.touchState.currentX = touch.clientX - rect.left;
+        this.touchState.currentY = touch.clientY - rect.top;
+        
+        // Calculate direction and distance
+        const dx = this.touchState.currentX - this.touchState.startX;
+        const dy = this.touchState.currentY - this.touchState.startY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Update joystick position with limit on distance
+        if (distance > this.joystick.radius) {
+            const angle = Math.atan2(dy, dx);
+            this.joystick.stickX = this.joystick.baseX + Math.cos(angle) * this.joystick.radius;
+            this.joystick.stickY = this.joystick.baseY + Math.sin(angle) * this.joystick.radius;
+        } else {
+            this.joystick.stickX = this.touchState.currentX;
+            this.joystick.stickY = this.touchState.currentY;
+        }
+        
+        // Set movement keys based on joystick position
+        const threshold = 10;
+        this.keys.ArrowLeft = dx < -threshold;
+        this.keys.ArrowRight = dx > threshold;
+        this.keys.ArrowUp = dy < -threshold;
+        this.keys.ArrowDown = dy > threshold;
+    }
+    
+    handleTouchEnd(e) {
+        e.preventDefault();
+        
+        // Reset touch state and keys
+        this.touchState.active = false;
+        this.joystick.visible = false;
+        
+        // Reset all movement keys
+        this.keys.ArrowLeft = false;
+        this.keys.ArrowRight = false;
+        this.keys.ArrowUp = false;
+        this.keys.ArrowDown = false;
     }
 
     spawnEggs() {
@@ -287,6 +460,10 @@ class Game {
         // Clean up event listeners
         window.removeEventListener('keydown', this.boundHandleKeyDown);
         window.removeEventListener('keyup', this.boundHandleKeyUp);
+        this.canvas.removeEventListener('touchstart', this.boundHandleTouchStart);
+        this.canvas.removeEventListener('touchmove', this.boundHandleTouchMove);
+        this.canvas.removeEventListener('touchend', this.boundHandleTouchEnd);
+        window.removeEventListener('resize', this.boundHandleResize);
         
         // Reset game state
         this.initializeGame();
@@ -1115,6 +1292,11 @@ class Game {
             this.drawObstacles();
             this.drawEggs();
             this.drawPlayer();
+            
+            // Draw virtual joystick on mobile
+            if (this.isMobile && this.joystick.visible) {
+                this.drawJoystick();
+            }
 
             // Ensure opacity is reset at the end of each frame
             this.ctx.globalAlpha = 1.0;
@@ -1122,6 +1304,25 @@ class Game {
             // Continue the game loop
             requestAnimationFrame(this.gameLoop.bind(this));
         }
+    }
+    
+    drawJoystick() {
+        // Draw joystick base (semi-transparent circle)
+        this.ctx.globalAlpha = 0.3;
+        this.ctx.fillStyle = '#888888';
+        this.ctx.beginPath();
+        this.ctx.arc(this.joystick.baseX, this.joystick.baseY, this.joystick.radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Draw joystick stick (more opaque)
+        this.ctx.globalAlpha = 0.6;
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.beginPath();
+        this.ctx.arc(this.joystick.stickX, this.joystick.stickY, this.joystick.stickRadius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Reset alpha
+        this.ctx.globalAlpha = 1.0;
     }
 }
 
