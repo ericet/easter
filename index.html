@@ -9,6 +9,76 @@
     <link rel="alternate icon" href="assets/favicon/favicon.ico">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+        
+        /* Easter-themed decorative elements */
+        .egg-icon-small {
+            width: 20px;
+            height: 25px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            display: inline-block;
+            margin: 0 5px;
+            position: relative;
+            animation: floatUpDown 3s ease-in-out infinite;
+        }
+        
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .easter-decoration {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+            height: 30px;
+        }
+        
+        .easter-decoration::before, .easter-decoration::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(222, 184, 135, 0.5), transparent);
+        }
+        
+        .easter-decoration::before {
+            left: 0;
+        }
+        
+        .easter-decoration::after {
+            right: 0;
+        }
+        
+        #score-time {
+            font-size: 24px;
+            font-weight: bold;
+            color: #483D8B;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(147, 112, 219, 0.3);
+            border: 2px solid rgba(147, 112, 219, 0.3);
+            position: relative;
+        }
+        
+        #score-time::before, #score-time::after {
+            content: '🥚';
+            font-size: 18px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        #score-time::before {
+            left: 15px;
+        }
+        
+        #score-time::after {
+            right: 15px;
+        }
 
         html,
         body {
@@ -25,11 +95,59 @@
             background: linear-gradient(135deg, #FFE4E1 0%, #FFB6C1 100%);
             font-family: 'Comic Neue', cursive;
             background-image:
-                radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.2) 2%, transparent 0%),
-                radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.2) 2%, transparent 0%);
-            background-size: 100px 100px;
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><path d="M20 5C12.8 5 7 10.8 7 18c0 7.2 5.8 13 13 13s13-5.8 13-13C33 10.8 27.2 5 20 5zm0 2c6.1 0 11 4.9 11 11s-4.9 11-11 11S9 24.1 9 18 13.9 7 20 7z" fill="rgba(255,255,255,0.15)"/></svg>'),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><path d="M30 10c-9.9 0-18 8.1-18 18s8.1 18 18 18 18-8.1 18-18-8.1-18-18-18zm0 4c7.7 0 14 6.3 14 14s-6.3 14-14 14-14-6.3-14-14 6.3-14 14-14z" fill="rgba(255,182,193,0.2)"/></svg>');
+            background-position: 0 0, 30px 30px;
+            background-size: 40px 40px, 60px 60px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Add Easter eggs floating in the background */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        body::before {
+            background-image: 
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40"><ellipse cx="15" cy="20" rx="12" ry="15" fill="rgba(255,215,0,0.1)" /></svg>'),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="30" viewBox="0 0 20 30"><ellipse cx="10" cy="15" rx="8" ry="12" fill="rgba(173,216,230,0.1)" /></svg>');
+            background-position: 5% 10%, 80% 60%;
+            background-repeat: no-repeat;
+            animation: floatEggs 20s linear infinite;
+        }
+        
+        body::after {
+            background-image: 
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="25" height="35" viewBox="0 0 25 35"><ellipse cx="12.5" cy="17.5" rx="10" ry="15" fill="rgba(221,160,221,0.1)" /></svg>'),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="25" viewBox="0 0 15 25"><ellipse cx="7.5" cy="12.5" rx="6" ry="10" fill="rgba(152,251,152,0.1)" /></svg>');
+            background-position: 20% 80%, 90% 30%;
+            background-repeat: no-repeat;
+            animation: floatEggs 15s linear infinite reverse;
+        }
+        
+        @keyframes floatEggs {
+            0% { background-position: 5% 10%, 80% 60%; }
+            50% { background-position: 10% 15%, 85% 55%; }
+            100% { background-position: 5% 10%, 80% 60%; }
         }
 
+        #main-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 80vh;
+        }
+        
         .main-container {
             display: flex;
             flex-direction: column;
@@ -48,17 +166,37 @@
         }
         
         .game-wrapper {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.92);
             padding: 15px;
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1);
-            border: 4px solid #DEB887;
-            max-height: 95vh;
+            box-shadow: 0 8px 32px rgba(147, 112, 219, 0.2);
+            border: 6px solid #9370DB;
+            border-image: linear-gradient(45deg, #9370DB, #87CEFA, #ADD8E6, #87CEFA, #9370DB) 1;
+            height: calc(100vh - 30px);
             margin: 5px;
             flex: 1;
             width: calc(100% - 30px);
             max-width: 800px;
-            overflow-y: auto;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 0;
+        }
+        
+        .game-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10"><path d="M0,10 C30,0 70,0 100,10" fill="none" stroke="#9370DB" stroke-width="2"/></svg>');
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            pointer-events: none;
         }
         
         @media (max-width: 767px) {
@@ -164,13 +302,13 @@
         #score-time {
             margin-bottom: 15px;
             font-size: 24px;
-            color: #8B4513;
+            color: #483D8B;
             font-weight: bold;
         }
 
         #instructions {
             margin-top: 15px;
-            color: #8B4513;
+            color: #483D8B;
             font-size: 16px;
         }
 
@@ -179,7 +317,7 @@
             text-align: center;
             margin-top: 10px;
             font-size: 14px;
-            color: #8B4513;
+            color: #483D8B;
         }
         
         @media (max-width: 767px) {
@@ -191,11 +329,15 @@
         /* Mode selection styles */
         #mode-selection {
             text-align: center;
-            margin: 20px 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         #mode-selection h2, #multiplayer-options h2 {
-            color: #8B4513;
+            color: #483D8B;
             margin-bottom: 20px;
             font-size: 24px;
         }
@@ -216,32 +358,42 @@
         }
         
         .game-preview {
-            margin: 20px auto;
+            margin: 0 auto 20px auto;
             text-align: center;
+            height: 35vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .preview-image {
             max-width: 100%;
+            max-height: 35vh;
+            width: auto;
             height: auto;
+            object-fit: contain;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
-            border: 3px solid #DEB887;
+            box-shadow: 0 4px 8px rgba(147, 112, 219, 0.2);
+            border: 3px solid #9370DB;
         }
         
         .mode-button {
-            padding: 15px 20px;
+            padding: 15px 30px;
             font-size: 16px;
             min-width: 180px;
-            background: linear-gradient(to bottom, #FFD700, #FFA500);
-            color: #8B4513;
+            background: linear-gradient(to bottom, #9370DB, #6A5ACD);
+            color: white;
             border: none;
             border-radius: 15px;
             cursor: pointer;
-            box-shadow: 0 4px 0 #8B4513;
+            box-shadow: 0 4px 0 #483D8B;
             transition: all 0.2s;
             font-family: 'Comic Neue', cursive;
             font-weight: bold;
-            -webkit-tap-highlight-color: transparent;
+            margin: 10px;
+            position: relative;
+            overflow: hidden;
         }
         
         @media (min-width: 768px) {
@@ -254,12 +406,12 @@
         
         .mode-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 0 #8B4513;
+            box-shadow: 0 6px 0 #483D8B;
         }
         
         .mode-button:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 0 #8B4513;
+            box-shadow: 0 2px 0 #483D8B;
         }
 
         .multiplayer-controls {
@@ -275,7 +427,7 @@
             padding: 10px;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
-            border: 2px solid #DEB887;
+            border: 2px solid #9370DB;
             text-align: center;
         }
 
@@ -327,8 +479,8 @@
 
         #chat-header {
             padding: 10px;
-            background: linear-gradient(to right, #FFB6C1, #FFC0CB);
-            color: #8B4513;
+            background: linear-gradient(to right, #9370DB, #87CEFA);
+            color: white;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
             font-weight: bold;
@@ -356,16 +508,16 @@
 
         .chat-message.sent {
             align-self: flex-end;
-            background: linear-gradient(45deg, #FFB6C1, #FFC0CB);
-            color: #8B4513;
-            border: 2px solid rgba(255, 182, 193, 0.4);
+            background: linear-gradient(45deg, #9370DB, #87CEFA);
+            color: white;
+            border: 2px solid rgba(147, 112, 219, 0.4);
             animation: hopIn 0.3s ease-out;
         }
 
         .chat-message.received {
             align-self: flex-start;
             background: linear-gradient(45deg, #E6E6FA, #F0F8FF);
-            color: #8B4513;
+            color: #483D8B;
             border: 2px solid rgba(230, 230, 250, 0.4);
             animation: hopIn 0.3s ease-out;
         }
@@ -384,7 +536,7 @@
 
         #chat-input-container {
             padding: 10px;
-            border-top: 2px solid #FFB6C1;
+            border-top: 2px solid #9370DB;
             display: flex;
             gap: 8px;
             background: rgba(255, 240, 245, 0.5);
@@ -395,7 +547,7 @@
         #chat-input {
             flex-grow: 1;
             padding: 8px;
-            border: 2px solid #FFB6C1;
+            border: 2px solid #9370DB;
             border-radius: 8px;
             outline: none;
             font-family: 'Comic Neue', cursive;
@@ -403,17 +555,16 @@
         }
 
         #chat-input:focus {
-            border-color: #8B4513;
+            border-color: #483D8B;
         }
 
         #send-message {
-            padding: 8px 16px;
-            background: linear-gradient(to right, #FFB6C1, #FFC0CB);
-            color: #8B4513;
+            padding: 8px 15px;
+            background: linear-gradient(to right, #9370DB, #87CEFA);
+            color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-family: 'Comic Neue', cursive;
             font-weight: bold;
             transition: all 0.2s;
             box-shadow: 0 2px 4px rgba(255, 182, 193, 0.3);
@@ -429,17 +580,17 @@
             position: fixed;
             right: 20px;
             bottom: 20px;
-            background: linear-gradient(to bottom, #FFB6C1, #FFC0CB);
-            color: #8B4513;
+            background: linear-gradient(to bottom, #9370DB, #87CEFA);
+            color: white;
             border: none;
             border-radius: 20px;
             padding: 10px 20px;
             cursor: pointer;
-            font-size: 16px;
+            font-weight: bold;
             display: none;
-            box-shadow: 0 4px 8px rgba(255, 182, 193, 0.4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 100;
             transition: all 0.3s;
-            z-index: 999;
         }
 
         #unread-count {
@@ -496,7 +647,7 @@
             background: white;
             padding: 20px;
             border-radius: 15px;
-            border: 4px solid #DEB887;
+            border: 4px solid #9370DB;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             min-width: 300px;
@@ -510,13 +661,13 @@
             display: flex;
             align-items: center;
             padding: 10px;
-            border-bottom: 1px solid #DEB887;
+            border-bottom: 1px solid #9370DB;
         }
 
         .result-item .place {
             font-weight: bold;
             margin-right: 15px;
-            color: #8B4513;
+            color: #483D8B;
         }
 
         .result-item .name {
@@ -525,7 +676,7 @@
 
         .result-item .score {
             font-weight: bold;
-            color: #8B4513;
+            color: #483D8B;
         }
 
         .result-item .crown {
@@ -537,7 +688,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #8B4513;
+            color: #483D8B;
             text-decoration: underline;
             padding: 5px;
         }
@@ -550,12 +701,12 @@
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 15px;
-            border: 4px solid #DEB887;
+            border: 4px solid #9370DB;
             width: 280px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1);
+            box-shadow: 0 8px 32px rgba(147, 112, 219, 0.1);
             margin-top: 39px;
             overflow: hidden;
             position: relative;
@@ -568,13 +719,13 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #DEB887;
+            border-bottom: 2px solid #9370DB;
         }
         
         .toggle-button {
             background: none;
             border: none;
-            color: #8B4513;
+            color: #483D8B;
             font-size: 24px;
             cursor: pointer;
             padding: 0 5px;
@@ -629,10 +780,10 @@
         }
 
         #leaderboard h2 {
-            color: #8B4513;
+            color: #483D8B;
             margin: 0;
             font-size: 24px;
-            text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.1);
+            text-shadow: 2px 2px 4px rgba(147, 112, 219, 0.1);
             padding-bottom: 0;
         }
 
@@ -644,7 +795,7 @@
             margin: 8px 0;
             background: rgba(255, 255, 255, 0.7);
             border-radius: 10px;
-            color: #8B4513;
+            color: #483D8B;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -681,7 +832,7 @@
 
         .leaderboard-entry:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+            box-shadow: 0 4px 8px rgba(147, 112, 219, 0.2);
         }
 
         .leaderboard-entry.highlight {
@@ -704,34 +855,51 @@
 
         .loading {
             text-align: center;
-            color: #8B4513;
+            color: #483D8B;
             padding: 20px;
             font-style: italic;
         }
 
         .game-button {
-            background: linear-gradient(to bottom, #FFD700, #FFA500);
-            color: #8B4513;
+            background: linear-gradient(to bottom, #9370DB, #6A5ACD);
+            color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 15px;
+            padding: 12px 24px;
+            border-radius: 25px;
             cursor: pointer;
-            box-shadow: 0 4px 0 #8B4513;
+            box-shadow: 0 4px 0 #483D8B, 0 0 10px rgba(147, 112, 219, 0.3);
             transition: all 0.2s;
             font-family: 'Comic Neue', cursive;
             font-weight: bold;
             font-size: 16px;
-            margin: 5px;
+            margin: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .game-button:hover::before {
+            left: 100%;
         }
 
         .game-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 0 #8B4513;
+            box-shadow: 0 6px 0 #483D8B, 0 0 15px rgba(147, 112, 219, 0.5);
         }
 
         .game-button:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 0 #8B4513;
+            box-shadow: 0 2px 0 #483D8B, 0 0 5px rgba(147, 112, 219, 0.3);
         }
 
         .game-button:disabled {
@@ -742,10 +910,29 @@
         }
 
         .game-title {
-            color: #8B4513;
+            color: #483D8B;
             margin: 0 0 20px 0;
-            font-size: 36px;
-            text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.2);
+            font-size: 42px;
+            text-shadow: 2px 2px 4px rgba(147, 112, 219, 0.2), 0 0 15px rgba(173, 216, 230, 0.3);
+            position: relative;
+            display: inline-block;
+            padding: 0 15px;
+        }
+        
+        .game-title::before, .game-title::after {
+            content: '🥚';
+            font-size: 28px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .game-title::before {
+            left: -20px;
+        }
+        
+        .game-title::after {
+            right: -20px;
         }
 
         .modal-overlay {
@@ -768,7 +955,7 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            border: 4px solid #DEB887;
+            border: 4px solid #9370DB;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             text-align: center;
@@ -776,7 +963,7 @@
         }
 
         #player-name-modal h3 {
-            color: #8B4513;
+            color: #483D8B;
             margin-top: 0;
         }
 
@@ -784,7 +971,7 @@
             margin: 10px 0 20px;
             padding: 15px 20px;
             width: 100%;
-            border: 3px solid #DEB887;
+            border: 3px solid #9370DB;
             border-radius: 10px;
             font-size: 16px;
             box-sizing: border-box;
@@ -792,13 +979,13 @@
         }
 
         #player-name-modal button {
-            background: linear-gradient(to bottom, #FFD700, #FFA500);
-            color: #8B4513;
+            background: linear-gradient(to bottom, #9370DB, #6A5ACD);
+            color: white;
             border: none;
             padding: 12px 25px;
             border-radius: 15px;
             cursor: pointer;
-            box-shadow: 0 4px 0 #8B4513;
+            box-shadow: 0 4px 0 #483D8B;
             transition: all 0.2s;
             font-family: 'Comic Neue', cursive;
             font-weight: bold;
@@ -807,36 +994,37 @@
 
         #player-name-modal button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 0 #8B4513;
+            box-shadow: 0 6px 0 #483D8B;
         }
 
         #player-name-modal button:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 0 #8B4513;
+            box-shadow: 0 2px 0 #483D8B;
         }
 
         .easter-egg {
             position: absolute;
             width: 30px;
             height: 40px;
-            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
+            background: linear-gradient(135deg, #ADD8E6, #9370DB, #ADD8E6);
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            transform: rotate(-20deg);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: -1;
+            z-index: 1;
+            opacity: 0.7;
+            box-shadow: 0 0 10px rgba(147, 112, 219, 0.3);
+            animation: float 3s ease-in-out infinite;
         }
 
         .easter-egg::before {
             content: '';
             position: absolute;
             top: 10%;
-            left: 20%;
-            width: 20%;
-            height: 20%;
-            background: rgba(255, 255, 255, 0.8);
+            left: 30%;
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 50%;
         }
-
+        
         .easter-egg::after {
             content: '';
             position: absolute;
@@ -849,9 +1037,15 @@
         }
 
         canvas {
-            border: 4px solid #DEB887;
+            border: 5px solid #9370DB;
             background-color: #E8F5E9;
-            border-radius: 10px;
+            background-image: 
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M30,10 C10,30 10,70 30,90 C50,70 50,30 30,10 Z" fill="rgba(152,251,152,0.1)"/></svg>'),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><path d="M60,20 C30,40 30,80 60,100 C90,80 90,40 60,20 Z" fill="rgba(255,182,193,0.1)"/></svg>');
+            background-position: 10% 20%, 80% 70%;
+            background-size: 100px 100px, 120px 120px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(222, 184, 135, 0.3);
         }
         
         #countdown-overlay {
@@ -864,7 +1058,7 @@
             background-color: rgba(255, 255, 255, 0.8);
             font-size: 72px;
             font-weight: bold;
-            color: #8B4513;
+            color: #483D8B;
             text-shadow:
                 3px 3px 0 #FFF,
                 -3px -3px 0 #FFF,
@@ -929,7 +1123,7 @@
             width: 90%;
             max-width: 600px;
             box-shadow: 0 8px 32px rgba(139, 69, 19, 0.2);
-            border: 4px solid #DEB887;
+            border: 4px solid #9370DB;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -940,7 +1134,7 @@
             right: 20px;
             font-size: 28px;
             font-weight: bold;
-            color: #8B4513;
+            color: #483D8B;
             cursor: pointer;
         }
         
@@ -951,8 +1145,8 @@
         }
         
         .instructions-section h3 {
-            color: #8B4513;
-            border-bottom: 2px dashed #DEB887;
+            color: #483D8B;
+            border-bottom: 2px dashed #9370DB;
             padding-bottom: 8px;
             margin-top: 25px;
         }
@@ -1021,7 +1215,7 @@
         
         .egg-description h4 {
             margin: 0 0 5px 0;
-            color: #8B4513;
+            color: #483D8B;
         }
         
         .egg-description p {
@@ -1066,19 +1260,23 @@
             padding: 12px 15px;
             margin: 10px 0 20px;
             border: 3px solid #DEB887;
-            border-radius: 10px;
+            border-radius: 15px;
             font-size: 16px;
             font-family: 'Comic Neue', cursive;
             background-color: rgba(255, 255, 255, 0.9);
             color: #8B4513;
-            box-shadow: 0 2px 5px rgba(139, 69, 19, 0.1);
+            box-shadow: 0 2px 5px rgba(139, 69, 19, 0.1), inset 0 0 10px rgba(255, 215, 0, 0.1);
             transition: all 0.3s ease;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M10,2 C5.6,2 2,5.6 2,10 C2,14.4 5.6,18 10,18 C14.4,18 18,14.4 18,10 C18,5.6 14.4,2 10,2 Z" fill="rgba(222,184,135,0.05)"/></svg>');
+            background-position: right 10px center;
+            background-repeat: no-repeat;
         }
         
         .easter-input:focus {
             outline: none;
             border-color: #FFD700;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), inset 0 0 10px rgba(255, 215, 0, 0.1);
+            transform: scale(1.02);
         }
         
         .easter-input::placeholder {
@@ -1115,11 +1313,12 @@
 
 <body>
     <div class="main-container">
-        <div class="game-wrapper">
+         <div class="game-wrapper">
             <div class="easter-egg" style="top: 20px; left: 20px;"></div>
             <div class="easter-egg" style="top: 40px; right: 30px;"></div>
             <div class="easter-egg" style="bottom: 30px; left: 40px;"></div>
             <div class="easter-egg" style="bottom: 50px; right: 20px;"></div>
+            <div style="height: 15vh;"></div>
             <div id="game-container">
                 <h1 class="game-title">🐰 Easter Egg Hunt 🥚</h1>
             
@@ -1136,6 +1335,7 @@
                 <div class="help-link">
                     <a href="#" id="howToPlayBtn" class="info-link">❓ How to Play</a>
                 </div>
+                <div style="height: 15vh;"></div>
             </div>
             
             <!-- Game UI -->
@@ -1331,10 +1531,15 @@
     
     <!-- High Score Modal -->
     <div id="player-name-modal">
-        <h3>New High Score!</h3>
+        <h3>🎉 New High Score! 🎉</h3>
+        <div class="easter-decoration">
+            <span class="egg-icon-small" style="background: linear-gradient(135deg, #FFD700, #FFA500);"></span>
+            <span class="egg-icon-small" style="background: linear-gradient(135deg, #FF69B4, #FFB6C1);"></span>
+            <span class="egg-icon-small" style="background: linear-gradient(135deg, #90EE90, #32CD32);"></span>
+        </div>
         <p>Congratulations! You collected <span class="final-score"></span> eggs!</p>
-        <input type="text" id="player-name" maxlength="15" placeholder="Enter your name here...">
-        <button onclick="submitScore()">Save Score</button>
+        <input type="text" id="player-name" maxlength="15" placeholder="Enter your name here..." class="easter-input">
+        <button onclick="submitScore()" class="game-button">Save Score</button>
     </div>
     
     <!-- Player Name Input Modal -->
