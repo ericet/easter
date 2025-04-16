@@ -179,16 +179,17 @@
             height: 400px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            border: 4px solid #DEB887;
-            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+            border: 4px solid #FFB6C1; /* Light pink for Easter */
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);
             z-index: 1000;
             display: flex;
             flex-direction: column;
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.95), rgba(255, 240, 245, 0.95));
         }
 
         #chat-header {
             padding: 10px;
-            background: #DEB887;
+            background: linear-gradient(to right, #FFB6C1, #FFC0CB);
             color: #8B4513;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
@@ -196,6 +197,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 4px rgba(255, 182, 193, 0.2);
         }
 
         #chat-messages {
@@ -216,14 +218,24 @@
 
         .chat-message.sent {
             align-self: flex-end;
-            background: #DEB887;
+            background: linear-gradient(45deg, #FFB6C1, #FFC0CB);
             color: #8B4513;
+            border: 2px solid rgba(255, 182, 193, 0.4);
+            animation: hopIn 0.3s ease-out;
         }
 
         .chat-message.received {
             align-self: flex-start;
-            background: #F5DEB3;
+            background: linear-gradient(45deg, #E6E6FA, #F0F8FF);
             color: #8B4513;
+            border: 2px solid rgba(230, 230, 250, 0.4);
+            animation: hopIn 0.3s ease-out;
+        }
+
+        @keyframes hopIn {
+            0% { transform: scale(0) translateY(20px); }
+            60% { transform: scale(1.1) translateY(-5px); }
+            100% { transform: scale(1) translateY(0); }
         }
 
         .message-sender {
@@ -234,18 +246,22 @@
 
         #chat-input-container {
             padding: 10px;
-            border-top: 2px solid #DEB887;
+            border-top: 2px solid #FFB6C1;
             display: flex;
             gap: 8px;
+            background: rgba(255, 240, 245, 0.5);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
         }
 
         #chat-input {
             flex-grow: 1;
             padding: 8px;
-            border: 2px solid #DEB887;
+            border: 2px solid #FFB6C1;
             border-radius: 8px;
             outline: none;
             font-family: 'Comic Neue', cursive;
+            background: rgba(255, 255, 255, 0.9);
         }
 
         #chat-input:focus {
@@ -254,7 +270,7 @@
 
         #send-message {
             padding: 8px 16px;
-            background: #DEB887;
+            background: linear-gradient(to right, #FFB6C1, #FFC0CB);
             color: #8B4513;
             border: none;
             border-radius: 8px;
@@ -262,11 +278,13 @@
             font-family: 'Comic Neue', cursive;
             font-weight: bold;
             transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(255, 182, 193, 0.3);
         }
 
         #send-message:hover {
-            background: #8B4513;
-            color: #DEB887;
+            background: linear-gradient(to right, #FFC0CB, #FFB6C1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 182, 193, 0.4);
         }
 
         #toggle-chat {
@@ -274,7 +292,7 @@
             right: 20px;
             bottom: 20px;
             padding: 10px 20px;
-            background: #DEB887;
+            background: linear-gradient(to right, #FFB6C1, #FFC0CB);
             color: #8B4513;
             border: none;
             border-radius: 8px;
@@ -283,6 +301,27 @@
             font-weight: bold;
             z-index: 1001;
             display: none;
+            box-shadow: 0 4px 8px rgba(255, 182, 193, 0.4);
+            transition: all 0.3s;
+        }
+
+        #toggle-chat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 182, 193, 0.5);
+        }
+
+        .emoji-option {
+            cursor: pointer;
+            font-size: 20px;
+            text-align: center;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .emoji-option:hover {
+            background: rgba(255, 182, 193, 0.2);
+            transform: scale(1.2);
         }
 
         #results-modal {
@@ -839,13 +878,28 @@
             <button id="toggle-chat" class="game-button">💬 Chat</button>
             <div id="chat-container" style="display: none;">
                 <div id="chat-header">
-                    <span>Game Chat</span>
+                    <span>🐰 Easter Chat 🥚</span>
                     <button id="minimize-chat" style="background: none; border: none; color: #8B4513; cursor: pointer;">−</button>
                 </div>
                 <div id="chat-messages"></div>
                 <div id="chat-input-container">
+                    <div id="emoji-picker" style="position: relative;">
+                        <button id="emoji-button" style="padding: 8px; background: none; border: none; cursor: pointer; font-size: 20px;">😊</button>
+                        <div id="emoji-list" style="display: none; position: absolute; bottom: 100%; left: 0; background: white; border: 2px solid #FFB6C1; border-radius: 8px; padding: 8px; width: 200px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            <span class="emoji-option">🐰</span>
+                            <span class="emoji-option">🥚</span>
+                            <span class="emoji-option">🌸</span>
+                            <span class="emoji-option">🌺</span>
+                            <span class="emoji-option">🐣</span>
+                            <span class="emoji-option">🌷</span>
+                            <span class="emoji-option">🐥</span>
+                            <span class="emoji-option">🌼</span>
+                            <span class="emoji-option">🎀</span>
+                            <span class="emoji-option">🌈</span>
+                        </div>
+                    </div>
                     <input type="text" id="chat-input" placeholder="Type your message..." maxlength="100">
-                    <button id="send-message">Send</button>
+                    <button id="send-message">🌸 Send</button>
                 </div>
             </div>
             

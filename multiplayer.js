@@ -403,6 +403,8 @@ class MultiplayerManager {
         const minimizeChat = document.getElementById('minimize-chat');
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-message');
+        const emojiButton = document.getElementById('emoji-button');
+        const emojiList = document.getElementById('emoji-list');
 
         // Toggle chat visibility
         toggleChat.addEventListener('click', () => {
@@ -415,6 +417,28 @@ class MultiplayerManager {
         minimizeChat.addEventListener('click', () => {
             chatContainer.style.display = 'none';
             toggleChat.style.display = 'block';
+            emojiList.style.display = 'none'; // Hide emoji list when minimizing
+        });
+
+        // Toggle emoji picker
+        emojiButton.addEventListener('click', () => {
+            emojiList.style.display = emojiList.style.display === 'none' ? 'grid' : 'none';
+        });
+
+        // Handle emoji selection
+        document.querySelectorAll('.emoji-option').forEach(emoji => {
+            emoji.addEventListener('click', () => {
+                chatInput.value += emoji.textContent;
+                emojiList.style.display = 'none';
+                chatInput.focus();
+            });
+        });
+
+        // Hide emoji list when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#emoji-picker')) {
+                emojiList.style.display = 'none';
+            }
         });
 
         // Send message on button click
