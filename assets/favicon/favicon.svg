@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Easter egg shape -->
+  <ellipse cx="16" cy="18" rx="12" ry="14" fill="#FFB6C1" stroke="#FF69B4" stroke-width="1.5" />
+  
+  <!-- Decorative patterns -->
+  <path d="M10,14 Q16,10 22,14" fill="none" stroke="#FF69B4" stroke-width="1" />
+  <path d="M10,18 Q16,14 22,18" fill="none" stroke="#FF69B4" stroke-width="1" />
+  <path d="M10,22 Q16,18 22,22" fill="none" stroke="#FF69B4" stroke-width="1" />
+  
+  <!-- Highlight spots -->
+  <circle cx="12" cy="12" r="2" fill="white" opacity="0.7" />
+  <circle cx="18" cy="10" r="1.5" fill="white" opacity="0.5" />
+</svg>
