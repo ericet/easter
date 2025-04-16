@@ -148,9 +148,15 @@ class Game {
         document.getElementById('score').textContent = '0';
         document.getElementById('time').textContent = '60';
         
-        // Hide game canvas initially
+        // Hide game canvas and container initially
         this.canvas.style.display = 'none';
         document.getElementById('score-time').style.display = 'block';
+        
+        // Hide the canvas container when game is not started
+        const canvasContainer = document.getElementById('canvas-container');
+        if (canvasContainer) {
+            canvasContainer.style.display = 'none';
+        }
         
         // Set canvas size responsively
         this.resizeCanvas();
@@ -255,28 +261,17 @@ class Game {
                 return;
             }
             
-            const containerWidth = container.clientWidth || 640;
+            // Use fixed dimensions to maintain consistent size across game sessions
+            const fixedWidth = 640;
+            const fixedHeight = 480;
             
-            // Calculate appropriate height based on aspect ratio (4:3)
-            const aspectRatio = 4/3;
-            const containerHeight = containerWidth / aspectRatio;
+            // Set canvas dimensions to fixed size
+            this.canvas.width = fixedWidth;
+            this.canvas.height = fixedHeight;
             
-            // Set canvas size (with a max size to keep game playable)
-            const maxWidth = 640;
-            const maxHeight = 480;
-            
-            // Calculate the new dimensions while maintaining aspect ratio
-            let newWidth = Math.min(containerWidth, maxWidth);
-            let newHeight = Math.min(containerHeight, maxHeight);
-            
-            // Ensure we maintain aspect ratio if height is constrained
-            if (newHeight === maxHeight && newWidth > maxWidth) {
-                newWidth = maxHeight * aspectRatio;
-            }
-            
-            // Set canvas dimensions
-            this.canvas.width = newWidth;
-            this.canvas.height = newHeight;
+            // Ensure the container maintains the proper dimensions
+            container.style.width = `${fixedWidth}px`;
+            container.style.height = `${fixedHeight}px`;
             
             // Reposition player if needed
             if (this.player) {
@@ -429,14 +424,20 @@ class Game {
     }
 
     async startGame() {
-        // Show game elements
+        // Show game elements and canvas container
         this.canvas.style.display = 'block';
         document.getElementById('score-time').style.display = 'block';
         document.getElementById('startButton').style.display = 'none';
         
+        // Show the canvas container when game starts
+        const canvasContainer = document.getElementById('canvas-container');
+        if (canvasContainer) {
+            canvasContainer.style.display = 'block';
+        }
+        
         // Show countdown
         const overlay = document.getElementById('countdown-overlay');
-        overlay.style.display = 'block';
+        overlay.style.display = 'flex';
         
         // Countdown sequence
         const messages = ['Ready...', 'Set...', 'GO!'];
@@ -471,23 +472,35 @@ class Game {
         // Hide restart button
         document.getElementById('restartButton').style.display = 'none';
         
-        // Show countdown
-        const overlay = document.getElementById('countdown-overlay');
-        overlay.style.display = 'block';
-        
-        // Countdown sequence
-        const messages = ['Ready...', 'Set...', 'GO!'];
-        for (let message of messages) {
-            overlay.textContent = message;
-            overlay.style.animation = 'none';
-            overlay.offsetHeight; // Trigger reflow
-            overlay.style.animation = 'scaleIn 0.5s ease-out';
-            await new Promise(resolve => setTimeout(resolve, 800));
+        // Show the canvas container when restarting the game
+        const canvasContainer = document.getElementById('canvas-container');
+        if (canvasContainer) {
+            canvasContainer.style.display = 'block';
         }
         
-        // Hide overlay and start game
+        // Show the canvas
+        this.canvas.style.display = 'block';
+        
+        // Show countdown
+        const overlay = document.getElementById('countdown-overlay');
         if (overlay) {
+            // Reset overlay styling
+            overlay.style.display = 'flex';
+            
+            // Countdown sequence
+            const messages = ['Ready...', 'Set...', 'GO!'];
+            for (let message of messages) {
+                overlay.textContent = message;
+                overlay.style.animation = 'none';
+                overlay.offsetHeight; // Trigger reflow
+                overlay.style.animation = 'scaleIn 0.5s ease-out';
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+            
+            // Hide overlay and start game
             overlay.style.display = 'none';
+        } else {
+            console.error('Countdown overlay element not found');
         }
         
         // Hide single player controls in multiplayer mode
@@ -498,6 +511,7 @@ class Game {
         // Start the game
         this.canvas.style.display = 'block';
         document.getElementById('score-time').style.display = 'block';
+        
         this.gameStarted = true;
         this.spawnEggs();
         this.startTimer();
@@ -515,11 +529,59 @@ class Game {
             }
         }, 1000);
     }
+    
+    resetForHome() {
+        // Stop the game timer if running
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+        
+        // Clean up event listeners
+        window.removeEventListener('keydown', this.boundHandleKeyDown);
+        window.removeEventListener('keyup', this.boundHandleKeyUp);
+        this.canvas.removeEventListener('touchstart', this.boundHandleTouchStart);
+        this.canvas.removeEventListener('touchmove', this.boundHandleTouchMove);
+        this.canvas.removeEventListener('touchend', this.boundHandleTouchEnd);
+        window.removeEventListener('resize', this.boundHandleResize);
+        
+        // Reset game state
+        this.gameOver = true;
+        this.gameStarted = false;
+        this.score = 0;
+        this.timeLeft = 60;
+        this.eggs = [];
+        
+        // Reset UI elements
+        document.getElementById('score').textContent = '0';
+        document.getElementById('time').textContent = '60';
+        document.getElementById('restartButton').style.display = 'none';
+        document.getElementById('startButton').style.display = 'block';
+        
+        // Hide canvas and container
+        this.canvas.style.display = 'none';
+        const canvasContainer = document.getElementById('canvas-container');
+        if (canvasContainer) {
+            canvasContainer.style.display = 'none';
+        }
+        
+        // Hide countdown overlay if visible
+        const overlay = document.getElementById('countdown-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
 
     async endGame() {
         this.gameOver = true;
         clearInterval(this.timer);
         window.lastScore = this.score;
+        
+        // Hide the canvas container when game ends
+        const canvasContainer = document.getElementById('canvas-container');
+        if (canvasContainer) {
+            canvasContainer.style.display = 'none';
+        }
         
         if (isMultiplayerMode) {
             await multiplayer.submitScore(this.score);
