@@ -17,6 +17,8 @@ class MultiplayerManager {
         this.playersRef = null;
         this.scoresRef = null;
         this.winsRef = null; // Reference to track player wins
+        this.chatRef = null; // Reference to chat messages
+        this.setupChatUI();
     }
     
     // Helper method to update UI for multiplayer mode
@@ -46,6 +48,7 @@ class MultiplayerManager {
             this.playersRef = this.sessionRef.child('players');
             this.scoresRef = this.sessionRef.child('scores');
             this.winsRef = this.sessionRef.child('wins');
+            this.chatRef = this.sessionRef.child('chat');
 
             await this.sessionRef.set({
                 status: 'waiting',
@@ -63,6 +66,10 @@ class MultiplayerManager {
             // Update UI for multiplayer mode
             this.updateMultiplayerUI();
             
+            // Show chat UI and setup listeners
+            document.getElementById('toggle-chat').style.display = 'block';
+            this.setupChatListener();
+            
             this.listenToPlayers();
             this.listenToGameStart();
             return this.sessionId;
@@ -79,6 +86,7 @@ class MultiplayerManager {
             this.playersRef = this.sessionRef.child('players');
             this.scoresRef = this.sessionRef.child('scores');
             this.winsRef = this.sessionRef.child('wins');
+            this.chatRef = this.sessionRef.child('chat');
 
             // Check if session exists
             const snapshot = await this.sessionRef.once('value');
@@ -96,6 +104,10 @@ class MultiplayerManager {
             
             // Update UI for multiplayer mode (hides single player start button and manages multiplayer start button)
             this.updateMultiplayerUI();
+            
+            // Show chat UI and setup listeners
+            document.getElementById('toggle-chat').style.display = 'block';
+            this.setupChatListener();
             
             // Update session link display
             const sessionLinkElement = safeGetElement('session-link');
@@ -383,6 +395,87 @@ class MultiplayerManager {
         } catch (error) {
             console.error('Error showing results:', error);
         }
+    }
+
+    setupChatUI() {
+        const toggleChat = document.getElementById('toggle-chat');
+        const chatContainer = document.getElementById('chat-container');
+        const minimizeChat = document.getElementById('minimize-chat');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-message');
+
+        // Toggle chat visibility
+        toggleChat.addEventListener('click', () => {
+            chatContainer.style.display = 'flex';
+            toggleChat.style.display = 'none';
+            chatInput.focus();
+        });
+
+        // Minimize chat
+        minimizeChat.addEventListener('click', () => {
+            chatContainer.style.display = 'none';
+            toggleChat.style.display = 'block';
+        });
+
+        // Send message on button click
+        sendButton.addEventListener('click', () => this.sendMessage());
+
+        // Send message on Enter key
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+    }
+
+    async sendMessage() {
+        const chatInput = document.getElementById('chat-input');
+        const message = chatInput.value.trim();
+
+        if (message && this.chatRef) {
+            try {
+                await this.chatRef.push({
+                    senderId: this.playerId,
+                    senderName: this.playerName,
+                    message: message,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                chatInput.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+    }
+
+    setupChatListener() {
+        if (this.chatRef) {
+            this.chatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                this.displayMessage(message);
+            });
+        }
+    }
+
+    displayMessage(message) {
+        const messagesContainer = document.getElementById('chat-messages');
+        const messageElement = document.createElement('div');
+        messageElement.className = `chat-message ${message.senderId === this.playerId ? 'sent' : 'received'}`;
+
+        const senderElement = document.createElement('div');
+        senderElement.className = 'message-sender';
+        senderElement.textContent = message.senderId === this.playerId ? 'You' : message.senderName;
+
+        const contentElement = document.createElement('div');
+        contentElement.className = 'message-content';
+        contentElement.textContent = message.message;
+
+        messageElement.appendChild(senderElement);
+        messageElement.appendChild(contentElement);
+        messagesContainer.appendChild(messageElement);
+
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
     cleanup() {

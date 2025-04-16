@@ -169,6 +169,122 @@
             margin-left: 10px;
         }
 
+        /* Chat styles */
+        #chat-container {
+            display: none;
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 300px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            border: 4px solid #DEB887;
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-header {
+            padding: 10px;
+            background: #DEB887;
+            color: #8B4513;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-message {
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-message.sent {
+            align-self: flex-end;
+            background: #DEB887;
+            color: #8B4513;
+        }
+
+        .chat-message.received {
+            align-self: flex-start;
+            background: #F5DEB3;
+            color: #8B4513;
+        }
+
+        .message-sender {
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        #chat-input-container {
+            padding: 10px;
+            border-top: 2px solid #DEB887;
+            display: flex;
+            gap: 8px;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 2px solid #DEB887;
+            border-radius: 8px;
+            outline: none;
+            font-family: 'Comic Neue', cursive;
+        }
+
+        #chat-input:focus {
+            border-color: #8B4513;
+        }
+
+        #send-message {
+            padding: 8px 16px;
+            background: #DEB887;
+            color: #8B4513;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Comic Neue', cursive;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        #send-message:hover {
+            background: #8B4513;
+            color: #DEB887;
+        }
+
+        #toggle-chat {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            padding: 10px 20px;
+            background: #DEB887;
+            color: #8B4513;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Comic Neue', cursive;
+            font-weight: bold;
+            z-index: 1001;
+            display: none;
+        }
+
         #results-modal {
             display: none;
             position: fixed;
@@ -716,6 +832,20 @@
                 </div>
                 <div id="instructions">
                     Use arrow keys to move • Collect eggs • Avoid trees
+                </div>
+            </div>
+
+            <!-- Chat UI -->
+            <button id="toggle-chat" class="game-button">💬 Chat</button>
+            <div id="chat-container" style="display: none;">
+                <div id="chat-header">
+                    <span>Game Chat</span>
+                    <button id="minimize-chat" style="background: none; border: none; color: #8B4513; cursor: pointer;">−</button>
+                </div>
+                <div id="chat-messages"></div>
+                <div id="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Type your message..." maxlength="100">
+                    <button id="send-message">Send</button>
                 </div>
             </div>
             
