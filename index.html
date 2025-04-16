@@ -1035,6 +1035,57 @@
         .multiplayer-buttons.second-row {
             margin-top: 15px;
         }
+        
+        /* Easter-themed input field */
+        .easter-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0 20px;
+            border: 3px solid #DEB887;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Comic Neue', cursive;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #8B4513;
+            box-shadow: 0 2px 5px rgba(139, 69, 19, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .easter-input:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        
+        .easter-input::placeholder {
+            color: #DEB887;
+            opacity: 0.7;
+        }
+        
+        /* Shake animation for invalid input */
+        @keyframes shake {
+            0%, 100% {transform: translateX(0);}
+            10%, 30%, 50%, 70%, 90% {transform: translateX(-5px);}
+            20%, 40%, 60%, 80% {transform: translateX(5px);}
+        }
+        
+        .shake {
+            animation: shake 0.5s ease;
+            border-color: #FF6347 !important;
+        }
+        
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
     </style>
 </head>
 
@@ -1253,11 +1304,49 @@
     <button id="show-leaderboard" class="game-button mobile-only" style="display: none;">🏆 Show Leaderboard</button>
 </div>
     <div class="modal-overlay"></div>
+    
+    <!-- High Score Modal -->
     <div id="player-name-modal">
         <h3>New High Score!</h3>
         <p>Congratulations! You collected <span class="final-score"></span> eggs!</p>
         <input type="text" id="player-name" maxlength="15" placeholder="Enter your name here...">
         <button onclick="submitScore()">Save Score</button>
+    </div>
+    
+    <!-- Player Name Input Modal -->
+    <div id="name-input-modal" class="modal" style="display: none;">
+        <div class="modal-content easter-notification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 400px; width: 90%; margin: 0; background: linear-gradient(to bottom, #FFF8E1, #FFECB3); border: 4px solid #DEB887; border-radius: 15px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); padding: 20px;">
+            <div class="modal-header" style="position: relative; margin-bottom: 15px;">
+                <h2 id="name-input-title" style="margin-top: 0; margin-bottom: 10px; text-align: center;">🐰 Enter Your Name 🐰</h2>
+                <span id="close-name-input" class="close" style="position: absolute; top: 0; right: 0; font-size: 24px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="notification-container" style="width: 100%; box-sizing: border-box;">
+                    <div class="notification-icon" style="text-align: center; font-size: 28px; margin-bottom: 10px;">🎮</div>
+                    <p id="name-input-message" style="text-align: center; margin-bottom: 15px;">Please enter your name to join the game:</p>
+                    <input type="text" id="multiplayer-name" maxlength="15" placeholder="Your name here..." class="easter-input" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+                    <button id="name-input-ok" class="game-button" style="display: block; margin: 0 auto;">Create Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Session ID Input Modal -->
+    <div id="session-input-modal" class="modal" style="display: none;">
+        <div class="modal-content easter-notification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 400px; width: 90%; margin: 0; background: linear-gradient(to bottom, #FFF8E1, #FFECB3); border: 4px solid #DEB887; border-radius: 15px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); padding: 20px;">
+            <div class="modal-header" style="position: relative; margin-bottom: 15px;">
+                <h2 id="session-input-title" style="margin-top: 0; margin-bottom: 10px; text-align: center;">🐰 Join Game Session 🐰</h2>
+                <span id="close-session-input" class="close" style="position: absolute; top: 0; right: 0; font-size: 24px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="notification-container" style="width: 100%; box-sizing: border-box;">
+                    <div class="notification-icon" style="text-align: center; font-size: 28px; margin-bottom: 10px;">🎲</div>
+                    <p id="session-input-message" style="text-align: center; margin-bottom: 15px;">Please enter the session ID to join:</p>
+                    <input type="text" id="session-id-input" maxlength="20" placeholder="Session ID here..." class="easter-input" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+                    <button id="session-input-ok" class="game-button" style="display: block; margin: 0 auto;">Continue</button>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -1371,46 +1460,159 @@
             document.getElementById('session-info').style.display = 'none';
         });
 
-        document.getElementById('createSessionButton').addEventListener('click', async () => {
-            const name = prompt('Enter your name:');
-            if (!name) return;
-
-            window.isMultiplayerMode = true;
-            const sessionId = await multiplayer.createSession();
-            await multiplayer.setPlayerName(name);
-
-            // Show session info and copy link
-            const sessionLink = `${window.location.href.split('?')[0]}?session=${sessionId}`;
-            document.getElementById('session-link').textContent = sessionLink;
-            document.getElementById('session-info').style.display = 'block';
-            document.getElementById('startMultiplayerButton').style.display = 'block';
-            document.getElementById('multiplayer-options').style.display = 'none';
-            document.getElementById('game-ui').style.display = 'block';
-            // Hide the regular start button in multiplayer mode
-            document.getElementById('startButton').style.display = 'none';
-        });
-
-        document.getElementById('joinSessionButton').addEventListener('click', async () => {
-            const sessionId = prompt('Enter session ID:');
-            if (!sessionId) return;
-
-            try {
-                await multiplayer.joinSession(sessionId);
-                const name = prompt('Enter your name:');
-                if (!name) return;
-
+        // Show name input modal for multiplayer
+        function showNameInputModal(callback, title = '🐰 Enter Your Name 🐰', message = 'Please enter your name to join the game:', buttonText = 'Join Game') {
+            const modal = document.getElementById('name-input-modal');
+            const titleElement = document.getElementById('name-input-title');
+            const messageElement = document.getElementById('name-input-message');
+            const inputElement = document.getElementById('multiplayer-name');
+            const okButton = document.getElementById('name-input-ok');
+            
+            // Clear previous input
+            inputElement.value = '';
+            
+            // Set title and message
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            
+            // Set button text based on context
+            okButton.textContent = buttonText;
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Focus the input field
+            setTimeout(() => {
+                inputElement.focus();
+            }, 100);
+            
+            // Handle OK button click
+            const handleOk = () => {
+                const name = inputElement.value.trim();
+                if (name) {
+                    modal.style.display = 'none';
+                    okButton.removeEventListener('click', handleOk);
+                    inputElement.removeEventListener('keypress', handleEnter);
+                    callback(name);
+                } else {
+                    // Shake the input field if empty
+                    inputElement.classList.add('shake');
+                    setTimeout(() => {
+                        inputElement.classList.remove('shake');
+                    }, 500);
+                }
+            };
+            
+            // Handle Enter key press
+            const handleEnter = (e) => {
+                if (e.key === 'Enter') {
+                    handleOk();
+                }
+            };
+            
+            // Add event listeners
+            okButton.addEventListener('click', handleOk);
+            inputElement.addEventListener('keypress', handleEnter);
+            
+            // Close button
+            document.getElementById('close-name-input').addEventListener('click', () => {
+                modal.style.display = 'none';
+                okButton.removeEventListener('click', handleOk);
+                inputElement.removeEventListener('keypress', handleEnter);
+            });
+        }
+        
+        // Show session ID input modal
+        function showSessionInputModal(callback) {
+            const modal = document.getElementById('session-input-modal');
+            const inputElement = document.getElementById('session-id-input');
+            const okButton = document.getElementById('session-input-ok');
+            
+            // Clear previous input
+            inputElement.value = '';
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Focus the input field
+            setTimeout(() => {
+                inputElement.focus();
+            }, 100);
+            
+            // Handle OK button click
+            const handleOk = () => {
+                const sessionId = inputElement.value.trim();
+                if (sessionId) {
+                    modal.style.display = 'none';
+                    okButton.removeEventListener('click', handleOk);
+                    inputElement.removeEventListener('keypress', handleEnter);
+                    callback(sessionId);
+                } else {
+                    // Shake the input field if empty
+                    inputElement.classList.add('shake');
+                    setTimeout(() => {
+                        inputElement.classList.remove('shake');
+                    }, 500);
+                }
+            };
+            
+            // Handle Enter key press
+            const handleEnter = (e) => {
+                if (e.key === 'Enter') {
+                    handleOk();
+                }
+            };
+            
+            // Add event listeners
+            okButton.addEventListener('click', handleOk);
+            inputElement.addEventListener('keypress', handleEnter);
+            
+            // Close button
+            document.getElementById('close-session-input').addEventListener('click', () => {
+                modal.style.display = 'none';
+                okButton.removeEventListener('click', handleOk);
+                inputElement.removeEventListener('keypress', handleEnter);
+            });
+        }
+        
+        document.getElementById('createSessionButton').addEventListener('click', () => {
+            showNameInputModal(async (name) => {
                 window.isMultiplayerMode = true;
+                const sessionId = await multiplayer.createSession();
                 await multiplayer.setPlayerName(name);
 
+                // Show session info and copy link
+                const sessionLink = `${window.location.href.split('?')[0]}?session=${sessionId}`;
+                document.getElementById('session-link').textContent = sessionLink;
                 document.getElementById('session-info').style.display = 'block';
-                document.getElementById('readyButton').style.display = 'block';
+                document.getElementById('startMultiplayerButton').style.display = 'block';
                 document.getElementById('multiplayer-options').style.display = 'none';
                 document.getElementById('game-ui').style.display = 'block';
                 // Hide the regular start button in multiplayer mode
                 document.getElementById('startButton').style.display = 'none';
-            } catch (error) {
-                alert(error.message);
-            }
+            }, '🐰 Create Game Session 🐰', 'Please enter your name to create a new game:', 'Create Game');
+        });
+
+        document.getElementById('joinSessionButton').addEventListener('click', () => {
+            showSessionInputModal(async (sessionId) => {
+                try {
+                    await multiplayer.joinSession(sessionId);
+                    
+                    showNameInputModal(async (name) => {
+                        window.isMultiplayerMode = true;
+                        await multiplayer.setPlayerName(name);
+
+                        document.getElementById('session-info').style.display = 'block';
+                        document.getElementById('readyButton').style.display = 'block';
+                        document.getElementById('multiplayer-options').style.display = 'none';
+                        document.getElementById('game-ui').style.display = 'block';
+                        // Hide the regular start button in multiplayer mode
+                        document.getElementById('startButton').style.display = 'none';
+                    }, '🐰 Join Game Session 🐰', 'Please enter your name to join the game:', 'Join Game');
+                } catch (error) {
+                    showNotification(error.message, '🐰 Session Error');
+                }
+            });
         });
 
         document.getElementById('readyButton').addEventListener('click', async () => {
@@ -1513,12 +1715,29 @@
                     // Try to join the session
                     await multiplayer.joinSession(sessionId);
                     
-                    // Get player name
-                    const name = prompt('Enter your name:');
-                    if (!name) return;
-
-                    window.isMultiplayerMode = true;
-                    await multiplayer.setPlayerName(name);
+                    // Get player name using modal
+                    showNameInputModal(async (name) => {
+                        window.isMultiplayerMode = true;
+                        await multiplayer.setPlayerName(name);
+                        
+                        // Continue with the rest of the function...
+                        // Helper function to safely set element display
+                        const safeSetDisplay = (id, display) => {
+                            const element = document.getElementById(id);
+                            if (element) element.style.display = display;
+                        };
+                        
+                        // Hide mode selection and show multiplayer UI with safe element access
+                        safeSetDisplay('mode-selection', 'none');
+                        safeSetDisplay('game-ui', 'block');
+                        safeSetDisplay('session-info', 'block');
+                        safeSetDisplay('readyButton', 'block');
+                        safeSetDisplay('multiplayer-controls', 'none');
+                        safeSetDisplay('leaderboard', 'none');
+                        safeSetDisplay('startMultiplayerButton', 'none'); // Hide start button for non-host players
+                        safeSetDisplay('startButton', 'none'); // Hide single-player start button
+                    });
+                    return; // Important: stop execution here until the modal callback completes
                     
                     // Helper function to safely set element display
                     const safeSetDisplay = (id, display) => {
