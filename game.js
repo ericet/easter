@@ -196,7 +196,7 @@ class Game {
         // Special egg chances
         const hasGoldenEgg = Math.random() < 0.2;  // 20% chance for golden egg
         const hasRainbowEgg = Math.random() < 0.1; // 10% chance for rainbow egg
-        const hasThunderEgg = Math.random() < 0.2; // 20% chance for thunder egg
+        const hasThunderEgg = Math.random() < 0.15; // 15% chance for thunder egg
         
         for (let i = 0; i < numEggs; i++) {
             let egg;
@@ -431,11 +431,11 @@ class Game {
                     // Show rainbow egg bonus with rainbow text
                     this.showBonusPoints(egg.x, egg.y, '+10', 'rainbow');
                 } else if (egg.isThunder) {
-                    // Permanently increase player speed by 50%
-                    this.player.speed = this.player.speed * 1.5;
+                    // Permanently increase player speed by 25%
+                    this.player.speed = this.player.speed * 1.25;
                     
                     // Show thunder speed boost notification
-                    this.showBonusPoints(egg.x, egg.y, '⚡ SPEED +50%! ⚡', '#FFFF00');
+                    this.showBonusPoints(egg.x, egg.y, '⚡ SPEED +25%! ⚡', '#FFFF00');
                     
                     this.score++;
                 } else {
