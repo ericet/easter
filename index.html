@@ -895,6 +895,7 @@
                     <button id="startButton" class="game-button">Start Game</button>
                     <button id="restartButton" class="game-button" style="display: none;">Play Again</button>
                     <button id="gameHowToPlayBtn" class="game-button info-button">❓ How to Play</button>
+                    <button id="homeButton" class="game-button">🏠 Home</button>
                 </div>
                 <div id="instructions">
                     Use arrow keys to move • Collect eggs • Avoid trees
@@ -960,7 +961,7 @@
                     <button id="joinSessionButton" class="game-button">Join Game</button>
                 </div>
                 <div class="multiplayer-buttons second-row">
-                    <button id="backToModeSelection" class="game-button">Back to Mode Selection</button>
+                    <button id="backToModeSelection" class="game-button">🏠 Home</button>
                     <button id="mpHowToPlayBtn" class="game-button info-button">❓ How to Play</button>
                 </div>
             </div>
@@ -1118,6 +1119,25 @@
         // Close buttons
         document.getElementById('close-how-to-play').addEventListener('click', hideHowToPlay);
         document.getElementById('close-instructions').addEventListener('click', hideHowToPlay);
+        
+        // Home button functionality
+        document.getElementById('homeButton').addEventListener('click', () => {
+            // Reset game state and return to mode selection
+            if (window.game && window.game.timer) {
+                clearInterval(window.game.timer);
+            }
+            document.getElementById('game-ui').style.display = 'none';
+            document.getElementById('multiplayer-options').style.display = 'none';
+            document.getElementById('session-info').style.display = 'none';
+            document.getElementById('mode-selection').style.display = 'block';
+            document.getElementById('leaderboard').style.display = 'none';
+            
+            // Reset multiplayer state if needed
+            window.isMultiplayerMode = false;
+            if (window.multiplayer && window.multiplayer.sessionId) {
+                window.multiplayer.leaveSession();
+            }
+        });
         
         // Mode selection handlers
         document.getElementById('singlePlayerMode').addEventListener('click', () => {
