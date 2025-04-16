@@ -291,18 +291,43 @@
             position: fixed;
             right: 20px;
             bottom: 20px;
-            padding: 10px 20px;
-            background: linear-gradient(to right, #FFB6C1, #FFC0CB);
+            background: linear-gradient(to bottom, #FFB6C1, #FFC0CB);
             color: #8B4513;
             border: none;
-            border-radius: 8px;
+            border-radius: 20px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-family: 'Comic Neue', cursive;
-            font-weight: bold;
-            z-index: 1001;
+            font-size: 16px;
             display: none;
             box-shadow: 0 4px 8px rgba(255, 182, 193, 0.4);
             transition: all 0.3s;
+            z-index: 999;
+        }
+
+        #unread-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #FF4444;
+            color: white;
+            border-radius: 12px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            font-size: 12px;
+            font-weight: bold;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #FFF;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         #toggle-chat:hover {
@@ -875,7 +900,7 @@
             </div>
 
             <!-- Chat UI -->
-            <button id="toggle-chat" class="game-button">💬 Chat</button>
+            <button id="toggle-chat" class="game-button">💬 Chat<span id="unread-count">0</span></button>
             <div id="chat-container" style="display: none;">
                 <div id="chat-header">
                     <span>🐰 Easter Chat 🥚</span>

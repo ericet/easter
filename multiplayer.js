@@ -411,6 +411,10 @@ class MultiplayerManager {
             chatContainer.style.display = 'flex';
             toggleChat.style.display = 'none';
             chatInput.focus();
+            // Reset unread count when opening chat
+            const unreadCount = document.getElementById('unread-count');
+            unreadCount.textContent = '0';
+            unreadCount.style.display = 'none';
         });
 
         // Minimize chat
@@ -497,6 +501,14 @@ class MultiplayerManager {
         messageElement.appendChild(senderElement);
         messageElement.appendChild(contentElement);
         messagesContainer.appendChild(messageElement);
+
+        // Update unread count if chat is minimized and message is from others
+        if (message.senderId !== this.playerId && document.getElementById('chat-container').style.display === 'none') {
+            const unreadCount = document.getElementById('unread-count');
+            const currentCount = parseInt(unreadCount.textContent || '0');
+            unreadCount.textContent = currentCount + 1;
+            unreadCount.style.display = 'flex';
+        }
 
         // Scroll to bottom
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
