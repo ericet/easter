@@ -292,12 +292,15 @@ class MultiplayerManager {
                 }))
                 .sort((a, b) => b.score - a.score);
 
-            // Get the winner (highest score)
+            // Get the winner (highest score) and update their win count
             if (sortedScores.length > 0) {
                 const winner = sortedScores[0];
                 
-                // Update win count for the winner
+                // Update win count for the winner and wait for it to complete
                 await this.updateWinCount(winner.id, winner.name);
+                
+                // Wait a moment for Firebase to sync
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
             
             // Get current win counts
