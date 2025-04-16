@@ -533,6 +533,7 @@ class MultiplayerManager {
             if (currentData) {
                 // Player already has wins, increment count
                 await playerWinsRef.update({
+                    name: playerName, // Ensure name is updated
                     wins: currentData.wins + 1
                 });
             } else {
