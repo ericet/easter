@@ -1350,7 +1350,6 @@
                 <div id="game-controls">
                     <button id="startButton" class="game-button">Start Game</button>
                     <button id="restartButton" class="game-button" style="display: none;">Play Again</button>
-                    <button id="gameHowToPlayBtn" class="game-button info-button">❓ How to Play</button>
                     <button id="homeButton" class="game-button">🏠 Home</button>
                 </div>
                 <div id="instructions">
@@ -1421,7 +1420,6 @@
                 </div>
                 <div class="multiplayer-buttons second-row">
                     <button id="backToModeSelection" class="game-button">🏠 Home</button>
-                    <button id="mpHowToPlayBtn" class="game-button info-button">❓ How to Play</button>
                 </div>
             </div>
             <div id="session-info">
@@ -1486,7 +1484,7 @@
                                 <div class="egg-icon thunder-egg"></div>
                                 <div class="egg-description">
                                     <h4>Thunder Egg</h4>
-                                    <p>Gives your bunny a permanent speed boost (+50%)! Also worth 1 point.</p>
+                                    <p>Gives your bunny a permanent speed boost (+25%)! Also worth 1 point.</p>
                                 </div>
                             </div>
                         </div>
@@ -1669,11 +1667,7 @@
             showHowToPlay();
         });
         
-        document.getElementById('gameHowToPlayBtn').addEventListener('click', showHowToPlay);
-        document.getElementById('mpHowToPlayBtn').addEventListener('click', showHowToPlay);
-        
         // Close buttons
-        document.getElementById('close-how-to-play').addEventListener('click', hideHowToPlay);
         document.getElementById('close-instructions').addEventListener('click', hideHowToPlay);
         
         // Home button functionality - reload the page for a completely fresh state
